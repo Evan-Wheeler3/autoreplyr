@@ -52,7 +52,7 @@ async function handleMissedCall(
     client_id: client.id,
     caller_number: callerNumber,
     status: 'in_progress',
-    current_question_index: 0,
+    current_question_index: -1,
     transcript: [],
   })
 
@@ -124,7 +124,44 @@ async function handleInboundSms(
   await db.update('leads', { id: `eq.${lead.id}` }, { transcript: updatedTranscript })
 
   const totalQuestions = flow.questions.length
-  const currentIndex = lead.current_question_index ?? 0
+  const currentIndex = lead.current_question_index ?? -1
+  const normalizedBody = body.trim().toUpperCase()
+
+  // Handle opt-in gate — index -1 means awaiting YES
+  if (currentIndex === -1) {
+    if (normalizedBody === 'STOP') {
+      await db.update('leads', { id: `eq.${lead.id}` }, {
+        status: 'lost',
+        completed_at: new Date().toISOString(),
+        transcript: updatedTranscript,
+      })
+      return
+    }
+
+    if (normalizedBody !== 'YES') {
+      const nudge = 'Reply YES to continue or STOP to opt out.'
+      await twilio.sendSmsWithRetry(callerNumber, twilioNumber, nudge, (err) =>
+        db.logError('send_optin_nudge', err, client.id, lead.id)
+      )
+      await db.insert('messages', { lead_id: lead.id, client_id: client.id, direction: 'outbound', body: nudge })
+      const nudgeEntry = { direction: 'outbound', body: nudge, sent_at: new Date().toISOString() }
+      await db.update('leads', { id: `eq.${lead.id}` }, { transcript: [...updatedTranscript, nudgeEntry] })
+      return
+    }
+
+    // YES received — send first question
+    const question = flow.questions[0]
+    await twilio.sendSmsWithRetry(callerNumber, twilioNumber, question.message, (err) =>
+      db.logError('send_question', err, client.id, lead.id)
+    )
+    await db.insert('messages', { lead_id: lead.id, client_id: client.id, direction: 'outbound', body: question.message })
+    const outEntry = { direction: 'outbound', body: question.message, sent_at: new Date().toISOString() }
+    await db.update('leads', { id: `eq.${lead.id}` }, {
+      current_question_index: 1,
+      transcript: [...updatedTranscript, outEntry],
+    })
+    return
+  }
 
   if (currentIndex < totalQuestions) {
     // Send next question
