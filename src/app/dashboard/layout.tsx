@@ -1,0 +1,58 @@
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) redirect('/login')
+
+  // Get client info
+  const db = createAdminClient()
+  const { data: clientUser } = await db
+    .from('client_users')
+    .select('client_id, clients(business_name)')
+    .eq('user_id', user.id)
+    .single()
+
+  const businessName = ((clientUser?.clients as unknown) as { business_name: string } | null)?.business_name ?? 'Your Business'
+
+  return (
+    <div className="min-h-screen flex">
+      <aside className="w-56 bg-gray-900 text-gray-100 flex flex-col shrink-0">
+        <div className="px-5 py-5 border-b border-gray-700">
+          <p className="font-bold text-white text-lg">autoreplyr</p>
+          <p className="text-xs text-gray-400 mt-0.5 truncate">{businessName}</p>
+        </div>
+
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          <NavLink href="/dashboard">Overview</NavLink>
+          <NavLink href="/dashboard/leads">All Leads</NavLink>
+        </nav>
+
+        <div className="px-3 py-4 border-t border-gray-700">
+          <form action="/api/auth/signout" method="POST">
+            <button className="text-sm text-gray-400 hover:text-white transition-colors w-full text-left px-2 py-1">
+              Sign out
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      <main className="flex-1 overflow-auto">{children}</main>
+    </div>
+  )
+}
+
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="block px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+    >
+      {children}
+    </Link>
+  )
+}
