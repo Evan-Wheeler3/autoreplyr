@@ -212,17 +212,28 @@ function ScrollingPlane() {
   useEffect(() => {
     setMaxScroll(document.documentElement.scrollHeight - window.innerHeight)
   }, [])
-  const progress = maxScroll > 0 ? scrollY / maxScroll : 0
-  const y = 12 + progress * 72
-  const tilt = progress * 22
+
+  const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0
+
+  // Y: top to bottom of viewport
+  const yVh = 8 + progress * 80
+
+  // X: sine arc — starts at right edge, swoops inward, returns to right edge
+  const swoop = Math.sin(progress * Math.PI) // 0 → 1 → 0
+  const rightVw = 1 + swoop * 22 // 1vw → 23vw → 1vw from right edge
+
+  // Rotation: follows direction of travel on the arc
+  // cos(p*π) = 1 at start (moving left), 0 at peak, -1 at end (moving right)
+  const tilt = -Math.cos(progress * Math.PI) * 22
 
   return (
     <div
-      className="fixed right-7 z-40 pointer-events-none hidden xl:block"
+      className="fixed z-40 pointer-events-none hidden xl:block"
       style={{
-        top: `${y}vh`,
+        top: `${yVh}vh`,
+        right: `${rightVw}vw`,
         transform: `rotate(${tilt}deg)`,
-        transition: 'top 0.08s linear',
+        transition: 'top 0.1s linear, right 0.1s linear',
         filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5))',
         opacity: 0.92,
       }}
