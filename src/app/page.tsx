@@ -67,41 +67,87 @@ function useSectionProgress(ref: RefObject<HTMLDivElement | null>) {
 
 /* ─── Phone Mockup ──────────────────────────────────────────────────────────── */
 
-const messages = [
-  { from: 'them', text: 'Hi, sorry we missed your call at Riverside HVAC. Reply YES for a quick response. Reply STOP to opt out.', delay: 300 },
-  { from: 'me',   text: 'YES', delay: 1100 },
-  { from: 'them', text: 'What type of service do you need?', delay: 1800 },
-  { from: 'me',   text: 'My AC stopped working last night', delay: 2700 },
-  { from: 'them', text: "Got it — that's urgent. The team has been notified and will reach out shortly!", delay: 3500 },
+const PREVIEW = [
+  { from: 'them' as const, text: 'Hi, sorry we missed your call at Riverside HVAC. Reply YES for a quick response. Reply STOP to opt out.', delay: 300 },
+  { from: 'me'   as const, text: 'YES', delay: 1100 },
+  { from: 'them' as const, text: 'What type of service do you need?', delay: 1800 },
+  { from: 'me'   as const, text: 'My AC stopped working last night', delay: 2700 },
+  { from: 'them' as const, text: "Got it — that's urgent. The team has been notified and will reach out shortly!", delay: 3500 },
 ]
 
+interface ChatMsg { from: 'them' | 'me'; text: string }
+
+function botReply(text: string): string {
+  const t = text.toLowerCase()
+  if (/price|cost|how much|charge/i.test(t))
+    return "Pricing depends on the job — our tech will walk you through it on-site."
+  if (/when|how long|arrive|eta|soon/i.test(t))
+    return "You're at the top of the list. Expect a call within the hour."
+  if (/thank/i.test(t))
+    return "Of course! We appreciate your patience."
+  if (/cancel|stop|never mind|forget/i.test(t))
+    return "No problem at all. Reach back out anytime!"
+  if (/emergency|urgent|asap|right now/i.test(t))
+    return "Flagging this as urgent — someone will call you very shortly."
+  if (/yes|yeah|yep|sure/i.test(t))
+    return "Great! Can you describe what's going on so we can send the right tech?"
+  return "Got it! Our team has been notified and will follow up with you shortly."
+}
+
 function PhoneMockup({ className = '' }: { className?: string }) {
-  const [visible, setVisible] = useState<number[]>([])
+  const [visibleCount, setVisibleCount] = useState(0)
+  const [extra, setExtra] = useState<ChatMsg[]>([])
+  const [input, setInput] = useState('')
+  const [enabled, setEnabled] = useState(false)
+  const [typing, setTyping] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = []
-    messages.forEach((msg, i) => {
-      timers.push(setTimeout(() => setVisible(v => [...v, i]), msg.delay))
-    })
-    return () => timers.forEach(clearTimeout)
+    const timers = PREVIEW.map((msg, i) =>
+      setTimeout(() => setVisibleCount(v => Math.max(v, i + 1)), msg.delay)
+    )
+    const enableTimer = setTimeout(() => setEnabled(true), PREVIEW[PREVIEW.length - 1].delay + 700)
+    return () => { timers.forEach(clearTimeout); clearTimeout(enableTimer) }
   }, [])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [visibleCount, extra, typing])
+
+  function send() {
+    const text = input.trim()
+    if (!text || typing) return
+    setExtra(prev => [...prev, { from: 'me', text }])
+    setInput('')
+    setTyping(true)
+    setTimeout(() => {
+      setTyping(false)
+      setExtra(prev => [...prev, { from: 'them', text: botReply(text) }])
+    }, 1000 + Math.random() * 700)
+  }
+
+  const bubbleCls = (from: 'them' | 'me') => ({
+    maxWidth: '78%',
+    padding: '8px 12px',
+    borderRadius: from === 'me' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+    background: from === 'me' ? '#1B2A4A' : '#f2f2f7',
+    color: from === 'me' ? '#ffffff' : '#000000',
+    fontSize: 13,
+    lineHeight: 1.4,
+    letterSpacing: -0.1,
+  })
 
   return (
     <div
       className={className}
       style={{
-        width: 300,
-        height: 580,
-        borderRadius: 44,
-        background: '#ffffff',
+        width: 300, height: 580, borderRadius: 44, background: '#ffffff',
         boxShadow: '0 50px 100px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.8)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0,
+        overflow: 'hidden', display: 'flex', flexDirection: 'column', flexShrink: 0,
       }}
     >
-      {/* Notch */}
+      {/* Status bar */}
       <div style={{ background: '#f2f2f7', padding: '14px 20px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: '#000', letterSpacing: -0.3 }}>9:41</span>
         <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
@@ -114,63 +160,85 @@ function PhoneMockup({ className = '' }: { className?: string }) {
         </div>
       </div>
 
-      {/* SMS Header */}
+      {/* Header */}
       <div style={{ background: '#f2f2f7', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '8px 16px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #1B2A4A, #2d4a7a)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <span style={{ color: 'white', fontSize: 16, fontWeight: 700 }}>A</span>
         </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 600, color: '#000', letterSpacing: -0.2 }}>AutoReplyr</div>
-          <div style={{ fontSize: 11, color: '#888' }}>Text Message</div>
+          <div style={{ fontSize: 11, color: '#888' }}>{typing ? 'Typing…' : 'Text Message'}</div>
         </div>
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, background: '#ffffff', padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'hidden' }}>
+      <div style={{ flex: 1, background: '#ffffff', padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
           <span style={{ fontSize: 11, color: '#999', background: '#f2f2f7', padding: '3px 10px', borderRadius: 10 }}>
             📞 Missed Call · just now
           </span>
         </div>
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              justifyContent: msg.from === 'me' ? 'flex-end' : 'flex-start',
-              opacity: visible.includes(i) ? 1 : 0,
-              transform: visible.includes(i) ? 'translateY(0) scale(1)' : 'translateY(6px) scale(0.97)',
-              transition: 'opacity 0.28s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1)',
-            }}
-          >
-            <div
-              style={{
-                maxWidth: '78%',
-                padding: '8px 12px',
-                borderRadius: msg.from === 'me' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                background: msg.from === 'me' ? '#1B2A4A' : '#f2f2f7',
-                color: msg.from === 'me' ? '#ffffff' : '#000000',
-                fontSize: 13,
-                lineHeight: 1.4,
-                letterSpacing: -0.1,
-              }}
-            >
-              {msg.text}
-            </div>
+
+        {PREVIEW.slice(0, visibleCount).map((msg, i) => (
+          <div key={i} style={{ display: 'flex', justifyContent: msg.from === 'me' ? 'flex-end' : 'flex-start', opacity: 1, transform: 'none', transition: 'opacity 0.28s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1)' }}>
+            <div style={bubbleCls(msg.from)}>{msg.text}</div>
           </div>
         ))}
+
+        {extra.map((msg, i) => (
+          <div key={`x${i}`} style={{ display: 'flex', justifyContent: msg.from === 'me' ? 'flex-end' : 'flex-start' }}>
+            <div style={bubbleCls(msg.from)}>{msg.text}</div>
+          </div>
+        ))}
+
+        {typing && (
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <div style={{ ...bubbleCls('them'), display: 'flex', gap: 4, alignItems: 'center', padding: '10px 14px' }}>
+              {[0, 1, 2].map(i => (
+                <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#999', animation: `typingDot 1.2s ${i * 0.2}s infinite` }} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {enabled && extra.length === 0 && !typing && (
+          <div style={{ textAlign: 'center', marginTop: 4 }}>
+            <span style={{ fontSize: 11, color: '#bbb' }}>Try replying ↓</span>
+          </div>
+        )}
+
+        <div ref={bottomRef} />
       </div>
 
-      {/* Input bar */}
+      {/* Input */}
       <div style={{ background: '#f2f2f7', padding: '8px 12px 16px', display: 'flex', gap: 8, alignItems: 'center' }}>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 20, padding: '8px 14px', fontSize: 13, color: '#aaa', border: '1px solid rgba(0,0,0,0.1)' }}>
-          iMessage
-        </div>
-        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1B2A4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <input
+          ref={inputRef}
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && send()}
+          disabled={!enabled}
+          placeholder={enabled ? 'Reply…' : 'iMessage'}
+          style={{
+            flex: 1, background: '#fff', borderRadius: 20, padding: '8px 14px',
+            fontSize: 13, color: '#000', border: '1px solid rgba(0,0,0,0.1)',
+            outline: 'none', opacity: enabled ? 1 : 0.5, transition: 'opacity 0.4s ease',
+          }}
+        />
+        <button
+          onClick={send}
+          disabled={!enabled || !input.trim()}
+          style={{
+            width: 30, height: 30, borderRadius: '50%', background: '#1B2A4A',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: 'none', cursor: enabled && input.trim() ? 'pointer' : 'default',
+            opacity: enabled && input.trim() ? 1 : 0.4, transition: 'opacity 0.2s ease', flexShrink: 0,
+          }}
+        >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M1 6 L11 6 M7 2 L11 6 L7 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </div>
+        </button>
       </div>
     </div>
   )
@@ -216,15 +284,7 @@ function ScrollingPlane() {
   }, [])
 
   const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0
-
-  // Straight down the right side
   const yVh = 8 + progress * 80
-
-  // Slow pivot: eased sweep from leaning left → vertical → leaning right
-  const tilt = Math.sin((progress - 0.5) * Math.PI) * 14
-
-  // Subtle horizontal drift to match the pivot
-  const rightVw = 2.5 + tilt * 0.15
 
   function handleClick() {
     document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })
@@ -235,9 +295,9 @@ function ScrollingPlane() {
       className="fixed z-40 hidden xl:flex items-center gap-2"
       style={{
         top: `${yVh}vh`,
-        right: `${rightVw}vw`,
+        right: '2vw',
         cursor: 'pointer',
-        transition: 'top 0.08s linear, right 0.08s linear',
+        transition: 'top 0.08s linear',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -259,7 +319,7 @@ function ScrollingPlane() {
         </div>
       )}
       <div style={{
-        transform: `rotate(${tilt}deg) scale(${hovered ? 1.15 : 1})`,
+        transform: `scale(${hovered ? 1.15 : 1})`,
         transition: 'transform 0.15s ease',
         filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5))',
         opacity: hovered ? 1 : 0.92,
@@ -485,6 +545,10 @@ function Hero() {
         @keyframes scrollDot {
           0%, 100% { transform: translateY(0); opacity: 1; }
           60% { transform: translateY(8px); opacity: 0; }
+        }
+        @keyframes typingDot {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-4px); opacity: 1; }
         }
       `}</style>
     </section>
