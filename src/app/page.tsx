@@ -261,16 +261,6 @@ function Hero() {
       className="relative min-h-screen flex items-center overflow-hidden"
       style={{ background: '#ffffff' }}
     >
-      {/* Dot grid with parallax */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(27,42,74,0.18) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-          transform: `translateY(${scrollY * 0.15}px)`,
-        }}
-      />
-
       {/* Top-right navy accent */}
       <div
         className="absolute pointer-events-none"
@@ -305,7 +295,7 @@ function Hero() {
           maxWidth: 580,
           maxHeight: 580,
           transform: `translate(-50%, calc(-50% + ${scrollY * 0.2}px))`,
-          opacity: 0.08,
+          opacity: 0.04,
           filter: 'grayscale(1)',
         }}
       >
