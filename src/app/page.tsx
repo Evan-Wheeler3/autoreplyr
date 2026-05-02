@@ -659,9 +659,41 @@ function StickyStory() {
 /* ─── How It Works ──────────────────────────────────────────────────────────── */
 
 const steps = [
-  { n: '01', title: 'Customer calls. No answer.', body: "You're on a job, driving, unavailable. The call would go to voicemail and stay there — another lead quietly lost." },
-  { n: '02', title: 'AutoReplyr fires in seconds.', body: 'The moment the call ends, AutoReplyr sends a personalized text. Your caller hears from you before they dial the next contractor.' },
-  { n: '03', title: 'Lead captured. You get notified.', body: 'Smart questions qualify the lead. Intent is scored. You get an instant alert when someone is ready to book.' },
+  {
+    n: '01', title: 'Customer calls. No answer.',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="20" fill="rgba(224,0,27,0.08)" />
+        <path d="M25.5 24.5c-.8-.8-1.9-1.3-3-.8l-1.2.5c-.4.2-.9.1-1.2-.2l-4.1-4.1c-.3-.3-.4-.8-.2-1.2l.5-1.2c.5-1.1 0-2.2-.8-3l-1.2-1.2c-.8-.8-2-.8-2.8 0l-.7.7C9.8 15 9.6 16.8 10.5 18.5c1.2 2.4 3.1 5 5.8 7.7 2.7 2.7 5.3 4.6 7.7 5.8 1.7.9 3.5.7 4.8-.6l.7-.7c.8-.8.8-2 0-2.8l-4-3.4z" fill="#E0001B" />
+        <line x1="26" y1="10" x2="32" y2="16" stroke="#E0001B" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="26" y1="10" x2="32" y2="10" stroke="#E0001B" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="32" y1="10" x2="32" y2="16" stroke="#E0001B" strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    n: '02', title: 'AutoReplyr fires in seconds.',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="20" fill="rgba(224,0,27,0.08)" />
+        <path d="M11 29L30 12" stroke="#E0001B" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M30 12L19 14.5L22 20L28.5 23L30 12Z" fill="#E0001B" />
+        <path d="M22 20L18 30L19.5 23.5" stroke="#E0001B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    n: '03', title: 'Lead captured. You get notified.',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="20" fill="rgba(224,0,27,0.08)" />
+        <rect x="11" y="13" width="18" height="13" rx="2" stroke="#E0001B" strokeWidth="2.2" />
+        <path d="M11 17l9 6 9-6" stroke="#E0001B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="28" cy="13" r="4" fill="#E0001B" />
+        <path d="M26.5 13l1 1.2 2-2" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
 ]
 
 function HowItWorks() {
@@ -703,7 +735,7 @@ function StepCard({ step, delay }: { step: typeof steps[number]; delay: number }
   return (
     <div
       ref={ref}
-      className="p-8 rounded-3xl"
+      className="p-10 rounded-3xl flex flex-col items-center text-center"
       style={{
         background: '#f8fafc',
         border: '1px solid #e8edf3',
@@ -712,14 +744,9 @@ function StepCard({ step, delay }: { step: typeof steps[number]; delay: number }
         transition: `opacity 0.65s cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
       }}
     >
-      <div className="flex items-center justify-between mb-8">
-        <span className="text-xs font-bold tracking-widest" style={{ color: 'rgba(224,0,27,0.4)' }}>{step.n}</span>
-        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(27,42,74,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#1B2A4A', opacity: 0.4 }} />
-        </div>
-      </div>
-      <h3 className="text-xl font-bold mb-3 leading-snug" style={{ color: '#1B2A4A', letterSpacing: -0.5 }}>{step.title}</h3>
-      <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>{step.body}</p>
+      <div className="mb-6">{step.icon}</div>
+      <span className="text-xs font-bold tracking-widest mb-3 block" style={{ color: 'rgba(224,0,27,0.4)' }}>{step.n}</span>
+      <h3 className="text-xl font-bold leading-snug" style={{ color: '#1B2A4A', letterSpacing: -0.5 }}>{step.title}</h3>
     </div>
   )
 }
