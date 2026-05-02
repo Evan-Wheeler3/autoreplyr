@@ -209,45 +209,64 @@ function Navbar() {
 function ScrollingPlane() {
   const scrollY = useScrollY()
   const [maxScroll, setMaxScroll] = useState(1)
+  const [hovered, setHovered] = useState(false)
+
   useEffect(() => {
     setMaxScroll(document.documentElement.scrollHeight - window.innerHeight)
   }, [])
 
   const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0
 
-  // Phase 1 (75% of scroll): descend the right side
-  // Phase 2 (last 25%): sweep left across the bottom to the left corner
-  const SPLIT = 0.75
+  // Straight down the right side
+  const yVh = 8 + progress * 80
 
-  let yVh: number
-  let rightVw: number
-  let tilt: number
+  // Falling drift: two overlapping sine waves for an organic tumbling feel
+  const drift = Math.sin(progress * Math.PI * 2.5) * 1.8 + Math.sin(progress * Math.PI * 4.7) * 0.7
+  const rightVw = 2.5 - drift
 
-  if (progress <= SPLIT) {
-    const p = progress / SPLIT                // 0 → 1
-    yVh = 8 + p * 80                          // 8vh → 88vh
-    rightVw = 2                               // pinned to right edge
-    tilt = p * 90                             // nose tilts from right-pointing → down-pointing
-  } else {
-    const p = (progress - SPLIT) / (1 - SPLIT) // 0 → 1
-    yVh = 88 + p * 4                           // 88vh → 92vh (barely moves)
-    rightVw = 2 + p * 92                       // sweeps all the way to left corner
-    tilt = 90 + p * 90                         // nose tilts from down-pointing → left-pointing
+  // Tilt follows the drift — leans into horizontal movement
+  const tilt = 20 + drift * 10
+
+  function handleClick() {
+    document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
     <div
-      className="fixed z-40 pointer-events-none hidden xl:block"
+      className="fixed z-40 hidden xl:flex items-center gap-2"
       style={{
         top: `${yVh}vh`,
         right: `${rightVw}vw`,
-        transform: `rotate(${tilt}deg)`,
-        transition: 'top 0.1s linear, right 0.1s linear',
-        filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5))',
-        opacity: 0.92,
+        cursor: 'pointer',
+        transition: 'top 0.08s linear, right 0.08s linear',
       }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={handleClick}
     >
-      <Image src="/plane.png" alt="" width={48} height={48} className="object-contain" />
+      {hovered && (
+        <div style={{
+          background: '#E0001B',
+          color: '#fff',
+          fontSize: 12,
+          fontWeight: 700,
+          padding: '5px 12px',
+          borderRadius: 20,
+          whiteSpace: 'nowrap',
+          boxShadow: '0 2px 12px rgba(224,0,27,0.35)',
+          letterSpacing: '0.02em',
+        }}>
+          Join Waitlist →
+        </div>
+      )}
+      <div style={{
+        transform: `rotate(${tilt}deg) scale(${hovered ? 1.15 : 1})`,
+        transition: 'transform 0.15s ease',
+        filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5))',
+        opacity: hovered ? 1 : 0.92,
+      }}>
+        <Image src="/plane.png" alt="Join Waitlist" width={48} height={48} className="object-contain" />
+      </div>
     </div>
   )
 }
@@ -778,6 +797,7 @@ function WaitlistCTA() {
 
   return (
     <section
+      id="waitlist"
       className="py-36 px-8 relative overflow-hidden"
       style={{ background: '#1B2A4A' }}
     >
