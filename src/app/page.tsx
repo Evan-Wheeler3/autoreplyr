@@ -663,7 +663,7 @@ const steps = [
     n: '01', title: 'Customer calls. No answer.',
     icon: (
       /* Missed call: coral circle, white phone + X */
-      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
         <circle cx="50" cy="50" r="50" fill="#E8606A" />
         <path d="M55 57.5c-1.8-1.8-4.2-2.8-6.5-1.8l-2.8 1.2c-.9.4-2 .2-2.7-.5l-9.2-9.2c-.7-.7-.9-1.8-.5-2.7l1.2-2.8c1-2.3 0-4.7-1.8-6.5L30.2 32c-1.8-1.8-4.5-1.8-6.2 0l-1.5 1.5C19.5 36.5 19 41 21.2 45.5c2.8 5.5 7.2 11.5 13.3 17.5 6 6 12 10.5 17.5 13.3 4.5 2.2 9 1.7 12 -1.3l1.5-1.5c1.8-1.8 1.8-4.5 0-6.2L55 57.5z" fill="white" />
         <line x1="68" y1="26" x2="80" y2="38" stroke="white" strokeWidth="6" strokeLinecap="round" />
@@ -675,7 +675,7 @@ const steps = [
     n: '02', title: 'AutoReplyr fires in seconds.',
     icon: (
       /* Stopwatch: red outline with hand */
-      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
         {/* Crown button */}
         <rect x="44" y="6" width="12" height="8" rx="3" fill="#E0001B" />
         {/* Lap button */}
@@ -702,7 +702,7 @@ const steps = [
     n: '03', title: 'Lead captured. You get notified.',
     icon: (
       /* Dollar sign */
-      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
         <text x="50" y="88" textAnchor="middle" fontSize="100" fontWeight="900" fontFamily="Arial, sans-serif" fill="#E0001B">$</text>
       </svg>
     ),
@@ -735,7 +735,7 @@ function HowItWorks() {
           </h2>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-6">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-12">
           {steps.map((s, i) => <StepCard key={i} step={s} delay={i * 130} />)}
         </div>
       </div>
@@ -748,17 +748,16 @@ function StepCard({ step, delay }: { step: typeof steps[number]; delay: number }
   return (
     <div
       ref={ref}
-      className="flex flex-col items-center text-center"
+      className="flex flex-col items-center text-center flex-1"
       style={{
-        width: 200,
         opacity: inView ? 1 : 0,
         transform: inView ? 'translateY(0)' : 'translateY(32px)',
         transition: `opacity 0.65s cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
       }}
     >
-      <div className="mb-5" style={{ width: 100, height: 100 }}>{step.icon}</div>
-      <span className="text-xs font-bold tracking-widest mb-2 block" style={{ color: 'rgba(224,0,27,0.5)' }}>{step.n}</span>
-      <h3 className="text-base font-bold leading-snug" style={{ color: '#1B2A4A', letterSpacing: -0.3 }}>{step.title}</h3>
+      <div className="mb-6" style={{ width: 160, height: 160 }}>{step.icon}</div>
+      <span className="text-sm font-bold tracking-widest mb-3 block" style={{ color: 'rgba(224,0,27,0.5)' }}>{step.n}</span>
+      <h3 className="text-2xl font-bold leading-snug" style={{ color: '#1B2A4A', letterSpacing: -0.5 }}>{step.title}</h3>
     </div>
   )
 }
