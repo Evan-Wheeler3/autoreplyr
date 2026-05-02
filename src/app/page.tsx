@@ -215,16 +215,25 @@ function ScrollingPlane() {
 
   const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0
 
-  // Y: top to bottom of viewport
-  const yVh = 8 + progress * 80
+  // Phase 1 (75% of scroll): descend the right side
+  // Phase 2 (last 25%): sweep left across the bottom to the left corner
+  const SPLIT = 0.75
 
-  // X: sine arc — starts at right edge, swoops inward, returns to right edge
-  const swoop = Math.sin(progress * Math.PI) // 0 → 1 → 0
-  const rightVw = 1 + swoop * 22 // 1vw → 23vw → 1vw from right edge
+  let yVh: number
+  let rightVw: number
+  let tilt: number
 
-  // Rotation: follows direction of travel on the arc
-  // cos(p*π) = 1 at start (moving left), 0 at peak, -1 at end (moving right)
-  const tilt = -Math.cos(progress * Math.PI) * 22
+  if (progress <= SPLIT) {
+    const p = progress / SPLIT                // 0 → 1
+    yVh = 8 + p * 80                          // 8vh → 88vh
+    rightVw = 2                               // pinned to right edge
+    tilt = p * 90                             // nose tilts from right-pointing → down-pointing
+  } else {
+    const p = (progress - SPLIT) / (1 - SPLIT) // 0 → 1
+    yVh = 88 + p * 4                           // 88vh → 92vh (barely moves)
+    rightVw = 2 + p * 92                       // sweeps all the way to left corner
+    tilt = 90 + p * 90                         // nose tilts from down-pointing → left-pointing
+  }
 
   return (
     <div
