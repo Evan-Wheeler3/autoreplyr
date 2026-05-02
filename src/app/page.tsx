@@ -234,14 +234,11 @@ function ScrollingPlane() {
         top: `${y}vh`,
         transform: `rotate(${tilt}deg)`,
         transition: 'top 0.08s linear',
-        filter: 'drop-shadow(0 2px 10px rgba(224,0,27,0.4))',
-        opacity: 0.85,
+        filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5))',
+        opacity: 0.92,
       }}
     >
-      <svg width="30" height="30" viewBox="0 0 48 48" fill="none">
-        <path d="M2 24 L46 6 L34 46 L22 28 Z" fill="#E0001B" />
-        <path d="M22 28 L34 46 L27 32 Z" fill="#9B0010" />
-      </svg>
+      <Image src="/plane.png" alt="" width={48} height={48} className="object-contain" />
     </div>
   )
 }
