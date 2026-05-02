@@ -220,12 +220,11 @@ function ScrollingPlane() {
   // Straight down the right side
   const yVh = 8 + progress * 80
 
-  // Falling drift: two overlapping sine waves for an organic tumbling feel
-  const drift = Math.sin(progress * Math.PI * 2.5) * 1.8 + Math.sin(progress * Math.PI * 4.7) * 0.7
-  const rightVw = 2.5 - drift
+  // Slow pivot: eased sweep from leaning left → vertical → leaning right
+  const tilt = Math.sin((progress - 0.5) * Math.PI) * 14
 
-  // Tilt follows the drift — leans into horizontal movement
-  const tilt = 20 + drift * 10
+  // Subtle horizontal drift to match the pivot
+  const rightVw = 2.5 + tilt * 0.15
 
   function handleClick() {
     document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })
