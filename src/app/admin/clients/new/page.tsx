@@ -11,6 +11,12 @@ const INDUSTRIES = [
   { value: 'pest_control', label: 'Pest Control' },
 ]
 
+const VOIP_TIERS = [
+  { value: 'openphone', label: 'OpenPhone' },
+  { value: 'twilio', label: 'Ported number (Twilio)' },
+  { value: 'ringcentral', label: 'RingCentral (coming soon)' },
+]
+
 export default function NewClientPage() {
   const router = useRouter()
   const [form, setForm] = useState({
@@ -18,8 +24,15 @@ export default function NewClientPage() {
     owner_name: '',
     owner_email: '',
     owner_notify_number: '',
-    twilio_number: '',
     industry: 'hvac',
+    voip_tier: 'openphone',
+    // OpenPhone fields
+    openphone_api_key: '',
+    openphone_number_id: '',
+    // Twilio fields
+    twilio_number: '',
+    ring_through_number: '',
+    // Shared optional
     booking_link: '',
     status: 'active',
   })
@@ -51,6 +64,9 @@ export default function NewClientPage() {
 
     router.push(`/admin/clients/${data.client.id}`)
   }
+
+  const isOpenPhone = form.voip_tier === 'openphone'
+  const isTwilio = form.voip_tier === 'twilio'
 
   return (
     <div className="p-8 max-w-2xl">
@@ -101,19 +117,6 @@ export default function NewClientPage() {
               className={inputCls}
             />
           </Field>
-          <Field label="Twilio Number" required>
-            <input
-              type="tel"
-              placeholder="+15555550000"
-              value={form.twilio_number}
-              onChange={(e) => set('twilio_number', e.target.value)}
-              required
-              className={inputCls}
-            />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
           <Field label="Industry" required>
             <select
               value={form.industry}
@@ -122,6 +125,22 @@ export default function NewClientPage() {
             >
               {INDUSTRIES.map((i) => (
                 <option key={i.value} value={i.value}>{i.label}</option>
+              ))}
+            </select>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Phone / VoIP System" required>
+            <select
+              value={form.voip_tier}
+              onChange={(e) => set('voip_tier', e.target.value)}
+              className={inputCls}
+            >
+              {VOIP_TIERS.map((t) => (
+                <option key={t.value} value={t.value} disabled={t.value === 'ringcentral'}>
+                  {t.label}
+                </option>
               ))}
             </select>
           </Field>
@@ -136,6 +155,56 @@ export default function NewClientPage() {
             </select>
           </Field>
         </div>
+
+        {isOpenPhone && (
+          <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 space-y-4">
+            <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">OpenPhone credentials</p>
+            <Field label="API Key" required>
+              <input
+                type="password"
+                placeholder="op_live_..."
+                value={form.openphone_api_key}
+                onChange={(e) => set('openphone_api_key', e.target.value)}
+                required={isOpenPhone}
+                className={inputCls}
+              />
+            </Field>
+            <Field label="Phone Number ID" required>
+              <input
+                placeholder="PN... (found in OpenPhone Settings → Integrations → API)"
+                value={form.openphone_number_id}
+                onChange={(e) => set('openphone_number_id', e.target.value)}
+                required={isOpenPhone}
+                className={inputCls}
+              />
+            </Field>
+          </div>
+        )}
+
+        {isTwilio && (
+          <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 space-y-4">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Twilio (ported number)</p>
+            <Field label="Twilio Number" required>
+              <input
+                type="tel"
+                placeholder="+15555550000"
+                value={form.twilio_number}
+                onChange={(e) => set('twilio_number', e.target.value)}
+                required={isTwilio}
+                className={inputCls}
+              />
+            </Field>
+            <Field label="Ring-Through Number">
+              <input
+                type="tel"
+                placeholder="+15555551234 (optional)"
+                value={form.ring_through_number}
+                onChange={(e) => set('ring_through_number', e.target.value)}
+                className={inputCls}
+              />
+            </Field>
+          </div>
+        )}
 
         <Field label="Booking Link">
           <input

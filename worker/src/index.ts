@@ -10,6 +10,11 @@ function twimlOk(): Response {
   })
 }
 
+function twimlDial(ringThroughNumber: string): Response {
+  const xml = `<?xml version="1.0" encoding="UTF-8"?><Response><Dial action="/no-answer" timeout="20">${ringThroughNumber}</Dial></Response>`
+  return new Response(xml, { headers: { 'Content-Type': 'text/xml' } })
+}
+
 function ok200(): Response {
   return new Response('OK', { status: 200 })
 }
@@ -24,30 +29,14 @@ async function parseFormBody(req: Request): Promise<Record<string, string>> {
   return params
 }
 
-async function handleMissedCall(
-  params: Record<string, string>,
+async function sendLeadSms(
+  client: Client,
+  flow: Flow,
+  callerNumber: string,
+  twilioNumber: string,
   db: SupabaseClient,
   twilio: TwilioClient
 ): Promise<void> {
-  const twilioNumber = params['To'] ?? params['Called']
-  const callerNumber = params['From'] ?? params['Caller']
-
-  if (!twilioNumber || !callerNumber) return
-
-  const client = await db.select<Client>('clients', {
-    twilio_number: `eq.${twilioNumber}`,
-    status: 'eq.active',
-    select: 'id,business_name,owner_name,owner_notify_number,booking_link,status',
-  })
-
-  if (!client) return
-
-  const flow = await db.select<Flow>('flows', {
-    client_id: `eq.${client.id}`,
-  })
-
-  if (!flow) return
-
   const lead = await db.insert<Lead>('leads', {
     client_id: client.id,
     caller_number: callerNumber,
@@ -80,6 +69,70 @@ async function handleMissedCall(
   })
 }
 
+// Fires when an incoming call arrives on a ported number.
+// If the client has a ring_through_number, Twilio dials it and waits for answer.
+// If not, SMS fires immediately.
+async function handleIncomingCall(
+  params: Record<string, string>,
+  db: SupabaseClient,
+  twilio: TwilioClient
+): Promise<Response> {
+  const twilioNumber = params['To'] ?? params['Called']
+  const callerNumber = params['From'] ?? params['Caller']
+
+  if (!twilioNumber || !callerNumber) return twimlOk()
+
+  const client = await db.select<Client>('clients', {
+    twilio_number: `eq.${twilioNumber}`,
+    status: 'eq.active',
+    select: 'id,business_name,owner_name,owner_notify_number,twilio_number,ring_through_number,booking_link,status',
+  })
+
+  if (!client) return twimlOk()
+
+  const flow = await db.select<Flow>('flows', { client_id: `eq.${client.id}` })
+  if (!flow) return twimlOk()
+
+  if (client.ring_through_number) {
+    // Ring the owner's phone — /no-answer fires if they don't pick up
+    return twimlDial(client.ring_through_number)
+  }
+
+  // No ring-through configured — fire SMS immediately
+  await sendLeadSms(client, flow, callerNumber, twilioNumber, db, twilio)
+  return twimlOk()
+}
+
+// Fires when a Dial completes without being answered.
+// DialCallStatus will be 'no-answer', 'busy', 'failed', or 'canceled'.
+// Only send SMS if the call was not answered.
+async function handleNoAnswer(
+  params: Record<string, string>,
+  db: SupabaseClient,
+  twilio: TwilioClient
+): Promise<void> {
+  const dialStatus = params['DialCallStatus']
+  if (dialStatus === 'completed') return
+
+  const twilioNumber = params['To'] ?? params['Called']
+  const callerNumber = params['From'] ?? params['Caller']
+
+  if (!twilioNumber || !callerNumber) return
+
+  const client = await db.select<Client>('clients', {
+    twilio_number: `eq.${twilioNumber}`,
+    status: 'eq.active',
+    select: 'id,business_name,owner_name,owner_notify_number,twilio_number,ring_through_number,booking_link,status',
+  })
+
+  if (!client) return
+
+  const flow = await db.select<Flow>('flows', { client_id: `eq.${client.id}` })
+  if (!flow) return
+
+  await sendLeadSms(client, flow, callerNumber, twilioNumber, db, twilio)
+}
+
 async function handleInboundSms(
   params: Record<string, string>,
   db: SupabaseClient,
@@ -98,7 +151,6 @@ async function handleInboundSms(
 
   if (!client) return
 
-  // Find active lead for this caller + client combo
   const lead = await db.select<Lead>('leads', {
     client_id: `eq.${client.id}`,
     caller_number: `eq.${callerNumber}`,
@@ -110,7 +162,6 @@ async function handleInboundSms(
   const flow = await db.select<Flow>('flows', { client_id: `eq.${client.id}` })
   if (!flow) return
 
-  // Log inbound message
   await db.insert('messages', {
     lead_id: lead.id,
     client_id: client.id,
@@ -127,7 +178,6 @@ async function handleInboundSms(
   const currentIndex = lead.current_question_index ?? -1
   const normalizedBody = body.trim().toUpperCase()
 
-  // Handle opt-in gate — index -1 means awaiting YES
   if (currentIndex === -1) {
     if (normalizedBody === 'STOP') {
       await db.update('leads', { id: `eq.${lead.id}` }, {
@@ -149,7 +199,6 @@ async function handleInboundSms(
       return
     }
 
-    // YES received — send first question
     const question = flow.questions[0]
     await twilio.sendSmsWithRetry(callerNumber, twilioNumber, question.message, (err) =>
       db.logError('send_question', err, client.id, lead.id)
@@ -164,31 +213,22 @@ async function handleInboundSms(
   }
 
   if (currentIndex < totalQuestions) {
-    // Send next question
     const question = flow.questions[currentIndex]
     await twilio.sendSmsWithRetry(callerNumber, twilioNumber, question.message, (err) =>
       db.logError('send_question', err, client.id, lead.id)
     )
-
     await db.insert('messages', {
       lead_id: lead.id,
       client_id: client.id,
       direction: 'outbound',
       body: question.message,
     })
-
-    const outEntry = {
-      direction: 'outbound',
-      body: question.message,
-      sent_at: new Date().toISOString(),
-    }
-
+    const outEntry = { direction: 'outbound', body: question.message, sent_at: new Date().toISOString() }
     await db.update('leads', { id: `eq.${lead.id}` }, {
       current_question_index: currentIndex + 1,
       transcript: [...updatedTranscript, outEntry],
     })
   } else {
-    // All questions answered — score intent and route
     const allTranscript = [...updatedTranscript]
     const intent = scoreIntent(allTranscript, flow.high_intent_triggers)
     const summary = buildSummary(allTranscript)
@@ -204,7 +244,6 @@ async function handleInboundSms(
       })
       newStatus = 'qualified'
 
-      // Notify owner via SMS
       const ownerAlert = `New lead from ${callerNumber}: ${summary}. Urgency: HIGH.`
       await twilio.sendSmsWithRetry(
         client.owner_notify_number,
@@ -227,20 +266,13 @@ async function handleInboundSms(
     await twilio.sendSmsWithRetry(callerNumber, twilioNumber, replyMessage, (err) =>
       db.logError('send_outcome_sms', err, client.id, lead.id)
     )
-
     await db.insert('messages', {
       lead_id: lead.id,
       client_id: client.id,
       direction: 'outbound',
       body: replyMessage,
     })
-
-    const outEntry = {
-      direction: 'outbound',
-      body: replyMessage,
-      sent_at: new Date().toISOString(),
-    }
-
+    const outEntry = { direction: 'outbound', body: replyMessage, sent_at: new Date().toISOString() }
     await db.update('leads', { id: `eq.${lead.id}` }, {
       status: newStatus,
       intent_level: intent,
@@ -262,9 +294,12 @@ export default {
     try {
       const params = await parseFormBody(request)
 
-      if (url.pathname === '/missed-call') {
-        // For POC: treat every incoming call as a missed call and fire SMS immediately
-        await handleMissedCall(params, db, twilio)
+      if (url.pathname === '/incoming-call') {
+        return await handleIncomingCall(params, db, twilio)
+      }
+
+      if (url.pathname === '/no-answer') {
+        await handleNoAnswer(params, db, twilio)
         return twimlOk()
       }
 
@@ -275,7 +310,6 @@ export default {
 
       return ok200()
     } catch (err) {
-      // Never let an unhandled error reach Twilio — it would retry the webhook
       try {
         await db.logError('unhandled_exception', err)
       } catch {

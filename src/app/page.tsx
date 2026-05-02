@@ -258,7 +258,11 @@ function Hero() {
     e.preventDefault()
     if (!email) return
     setLoading(true)
-    await new Promise(r => setTimeout(r, 700))
+    await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
     setLoading(false)
     setSubmitted(true)
   }
@@ -763,8 +767,13 @@ function WaitlistCTA() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!email) return
     setLoading(true)
-    await new Promise(r => setTimeout(r, 700))
+    await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
     setLoading(false)
     setSubmitted(true)
   }

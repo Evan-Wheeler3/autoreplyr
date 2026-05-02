@@ -10,6 +10,8 @@ export interface Client {
   business_name: string
   owner_name: string
   owner_notify_number: string
+  twilio_number: string
+  ring_through_number: string | null
   booking_link: string | null
   status: 'active' | 'inactive'
 }

@@ -1,8 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server'
-import { getTemplate } from '@/lib/industry-templates'
 import { sendWelcomeEmail } from '@/lib/email'
 import { NextResponse } from 'next/server'
-import type { Industry } from '@/types'
 
 export async function POST(req: Request) {
   const body = await req.json()
@@ -11,22 +9,33 @@ export async function POST(req: Request) {
     owner_name,
     owner_email,
     owner_notify_number,
-    twilio_number,
     industry,
+    voip_tier,
+    // OpenPhone
+    openphone_api_key,
+    openphone_number_id,
+    // Twilio
+    twilio_number,
+    ring_through_number,
+    // Shared
     booking_link,
     status,
   } = body
 
-  if (
-    !business_name || !owner_name || !owner_email ||
-    !owner_notify_number || !twilio_number || !industry
-  ) {
+  if (!business_name || !owner_name || !owner_email || !owner_notify_number || !industry || !voip_tier) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
+  if (voip_tier === 'openphone' && (!openphone_api_key || !openphone_number_id)) {
+    return NextResponse.json({ error: 'OpenPhone API key and Phone Number ID are required' }, { status: 400 })
+  }
+
+  if (voip_tier === 'twilio' && !twilio_number) {
+    return NextResponse.json({ error: 'Twilio number is required for ported number clients' }, { status: 400 })
   }
 
   const db = createAdminClient()
 
-  // Create client record
   const { data: client, error: clientErr } = await db
     .from('clients')
     .insert({
@@ -34,8 +43,12 @@ export async function POST(req: Request) {
       owner_name,
       owner_email,
       owner_notify_number,
-      twilio_number,
       industry,
+      voip_tier,
+      openphone_api_key: openphone_api_key || null,
+      openphone_number_id: openphone_number_id || null,
+      twilio_number: twilio_number || null,
+      ring_through_number: ring_through_number || null,
       booking_link: booking_link || null,
       status: status ?? 'active',
     })
@@ -46,14 +59,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: clientErr?.message ?? 'Failed to create client' }, { status: 500 })
   }
 
-  // Create default flow from industry template
-  const template = getTemplate(industry as Industry)
-  await db.from('flows').insert({
-    client_id: client.id,
-    ...template,
-  })
+  await db.from('flows').insert({ client_id: client.id })
 
-  // Create Supabase auth user for client
   const tempPassword = Math.random().toString(36).slice(-10) + 'A1!'
   const { data: authUser, error: authErr } = await db.auth.admin.createUser({
     email: owner_email,
@@ -62,13 +69,11 @@ export async function POST(req: Request) {
   })
 
   if (!authErr && authUser.user) {
-    // Link in client_users
     await db.from('client_users').insert({
       client_id: client.id,
       user_id: authUser.user.id,
     })
 
-    // Send welcome email
     try {
       await sendWelcomeEmail({
         toEmail: owner_email,
@@ -77,7 +82,7 @@ export async function POST(req: Request) {
         tempPassword,
       })
     } catch {
-      // Non-fatal — client is created, email just failed
+      // Non-fatal
     }
   }
 

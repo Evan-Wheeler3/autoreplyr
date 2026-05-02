@@ -1,8 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { statusBadge } from '@/components/ui/badge'
-import { INDUSTRY_LABELS } from '@/lib/industry-templates'
-import type { Industry } from '@/types'
 
 export default async function ClientsPage() {
   const db = createAdminClient()
@@ -58,7 +56,7 @@ export default async function ClientsPage() {
                   <p className="text-xs text-gray-400">{client.owner_email}</p>
                 </td>
                 <td className="px-5 py-3 text-gray-600">
-                  {INDUSTRY_LABELS[client.industry as Industry] ?? client.industry}
+                  {client.industry}
                 </td>
                 <td className="px-5 py-3">{statusBadge(client.status)}</td>
                 <td className="px-5 py-3 text-gray-700">
