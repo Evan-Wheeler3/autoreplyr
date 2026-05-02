@@ -259,7 +259,7 @@ function Navbar() {
       }}
     >
       <div className="flex items-center gap-2.5">
-        <Image src="/logo.png" alt="AutoReplyr" width={32} height={32} className="object-contain" />
+        <Image src="/logo.png" alt="AutoReplyr" width={32} height={32} className="object-contain" style={{ mixBlendMode: 'multiply' }} />
         <span
           className="font-bold text-lg tracking-tight transition-colors duration-300"
           style={{ color: scrolled ? '#1B2A4A' : '#1B2A4A' }}
@@ -958,7 +958,6 @@ function Footer() {
       style={{ background: '#0f1923', borderTop: '1px solid rgba(255,255,255,0.04)' }}
     >
       <div className="flex items-center gap-2.5">
-        <Image src="/logo.png" alt="AutoReplyr" width={22} height={22} className="object-contain" style={{ filter: 'brightness(0) invert(1)', opacity: 0.5 }} />
         <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.35)' }}>AutoReplyr</span>
       </div>
       <div className="flex items-center gap-6">
