@@ -662,7 +662,7 @@ const steps = [
   {
     n: '01', title: 'Customer calls. No answer.',
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+      <svg width="100" height="100" viewBox="0 0 40 40" fill="none">
         <circle cx="20" cy="20" r="20" fill="rgba(224,0,27,0.08)" />
         <path d="M25.5 24.5c-.8-.8-1.9-1.3-3-.8l-1.2.5c-.4.2-.9.1-1.2-.2l-4.1-4.1c-.3-.3-.4-.8-.2-1.2l.5-1.2c.5-1.1 0-2.2-.8-3l-1.2-1.2c-.8-.8-2-.8-2.8 0l-.7.7C9.8 15 9.6 16.8 10.5 18.5c1.2 2.4 3.1 5 5.8 7.7 2.7 2.7 5.3 4.6 7.7 5.8 1.7.9 3.5.7 4.8-.6l.7-.7c.8-.8.8-2 0-2.8l-4-3.4z" fill="#E0001B" />
         <line x1="26" y1="10" x2="32" y2="16" stroke="#E0001B" strokeWidth="2.5" strokeLinecap="round" />
@@ -674,7 +674,7 @@ const steps = [
   {
     n: '02', title: 'AutoReplyr fires in seconds.',
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+      <svg width="100" height="100" viewBox="0 0 40 40" fill="none">
         <circle cx="20" cy="20" r="20" fill="rgba(224,0,27,0.08)" />
         <path d="M11 29L30 12" stroke="#E0001B" strokeWidth="2.5" strokeLinecap="round" />
         <path d="M30 12L19 14.5L22 20L28.5 23L30 12Z" fill="#E0001B" />
@@ -685,7 +685,7 @@ const steps = [
   {
     n: '03', title: 'Lead captured. You get notified.',
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+      <svg width="100" height="100" viewBox="0 0 40 40" fill="none">
         <circle cx="20" cy="20" r="20" fill="rgba(224,0,27,0.08)" />
         <rect x="11" y="13" width="18" height="13" rx="2" stroke="#E0001B" strokeWidth="2.2" />
         <path d="M11 17l9 6 9-6" stroke="#E0001B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -699,7 +699,7 @@ const steps = [
 function HowItWorks() {
   const { ref, inView } = useInView(0.1)
   return (
-    <section className="py-32 px-8" style={{ background: '#ffffff' }}>
+    <section className="py-32 px-8" style={{ background: '#f4f6f9' }}>
       <div className="max-w-6xl mx-auto">
         <div ref={ref} className="mb-20">
           <p
@@ -722,7 +722,7 @@ function HowItWorks() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="flex flex-col sm:flex-row justify-center gap-6">
           {steps.map((s, i) => <StepCard key={i} step={s} delay={i * 130} />)}
         </div>
       </div>
@@ -735,18 +735,17 @@ function StepCard({ step, delay }: { step: typeof steps[number]; delay: number }
   return (
     <div
       ref={ref}
-      className="p-10 rounded-3xl flex flex-col items-center text-center"
+      className="flex flex-col items-center text-center"
       style={{
-        background: '#f8fafc',
-        border: '1px solid #e8edf3',
+        width: 200,
         opacity: inView ? 1 : 0,
         transform: inView ? 'translateY(0)' : 'translateY(32px)',
         transition: `opacity 0.65s cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 0.65s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
       }}
     >
-      <div className="mb-6">{step.icon}</div>
-      <span className="text-xs font-bold tracking-widest mb-3 block" style={{ color: 'rgba(224,0,27,0.4)' }}>{step.n}</span>
-      <h3 className="text-xl font-bold leading-snug" style={{ color: '#1B2A4A', letterSpacing: -0.5 }}>{step.title}</h3>
+      <div className="mb-5" style={{ width: 100, height: 100 }}>{step.icon}</div>
+      <span className="text-xs font-bold tracking-widest mb-2 block" style={{ color: 'rgba(224,0,27,0.5)' }}>{step.n}</span>
+      <h3 className="text-base font-bold leading-snug" style={{ color: '#1B2A4A', letterSpacing: -0.3 }}>{step.title}</h3>
     </div>
   )
 }
