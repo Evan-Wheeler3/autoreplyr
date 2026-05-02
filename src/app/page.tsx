@@ -200,17 +200,6 @@ function Navbar() {
           AutoReplyr
         </span>
       </div>
-      <Link
-        href="/login"
-        className="text-sm font-medium px-5 py-2 rounded-full transition-all duration-300"
-        style={{
-          color: '#1B2A4A',
-          background: scrolled ? 'rgba(27,42,74,0.08)' : 'rgba(27,42,74,0.06)',
-          border: '1px solid rgba(27,42,74,0.1)',
-        }}
-      >
-        Log in
-      </Link>
     </nav>
   )
 }

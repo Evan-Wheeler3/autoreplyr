@@ -23,7 +23,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <NavLink href="/admin/clients">Clients</NavLink>
         </nav>
 
-        <div className="px-3 py-4 border-t border-gray-700">
+        <div className="px-3 py-4 border-t border-gray-700 space-y-1">
+          <Link
+            href="/"
+            className="block px-2 py-1 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            ← Home
+          </Link>
           <form action="/api/auth/signout" method="POST">
             <button className="text-sm text-gray-400 hover:text-white transition-colors w-full text-left px-2 py-1">
               Sign out
