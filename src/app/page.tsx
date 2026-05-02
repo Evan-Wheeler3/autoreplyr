@@ -777,29 +777,7 @@ function WaitlistCTA() {
       className="py-36 px-8 relative overflow-hidden"
       style={{ background: '#1B2A4A' }}
     >
-      {/* Background logo ghost */}
-      <div
-        className="absolute pointer-events-none select-none"
-        style={{ right: -60, bottom: -60, width: 400, height: 400, opacity: 0.04 }}
-      >
-        <Image src="/logo.png" alt="" fill className="object-contain" sizes="400px" style={{ filter: 'brightness(0) invert(1)' }} />
-      </div>
-
       <div className="max-w-3xl mx-auto text-center relative z-10" ref={ref}>
-        <div
-          className="flex justify-center mb-10"
-          style={{ opacity: inView ? 1 : 0, transition: 'opacity 0.6s ease' }}
-        >
-          <Image
-            src="/logo.png"
-            alt="AutoReplyr"
-            width={56}
-            height={56}
-            className="object-contain"
-            style={{ filter: 'brightness(0) invert(1)', opacity: 0.9 }}
-          />
-        </div>
-
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-6"
           style={{
