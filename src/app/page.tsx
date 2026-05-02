@@ -306,8 +306,7 @@ function Hero() {
           maxWidth: 580,
           maxHeight: 580,
           transform: `translate(-50%, calc(-50% + ${scrollY * 0.2}px))`,
-          opacity: 0.04,
-          filter: 'grayscale(1)',
+          opacity: 0.12,
         }}
       >
         <Image src="/logo.png" alt="" fill className="object-contain" sizes="60vmin" priority />
