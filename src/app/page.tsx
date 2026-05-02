@@ -259,7 +259,8 @@ function Navbar() {
       }}
     >
       <div className="flex items-center gap-2.5">
-        <Image src="/logo.png" alt="AutoReplyr" width={32} height={32} className="object-contain" style={{ mixBlendMode: 'multiply' }} />
+        <Image src="/logo.png" alt="AutoReplyr" width={32} height={32} className="object-contain"
+          style={{ background: 'white', borderRadius: 6 }} />
         <span
           className="font-bold text-lg tracking-tight transition-colors duration-300"
           style={{ color: scrolled ? '#1B2A4A' : '#1B2A4A' }}
