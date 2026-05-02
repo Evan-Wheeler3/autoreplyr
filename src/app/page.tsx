@@ -206,31 +206,38 @@ function PhoneMockup({ className = '' }: { className?: string }) {
             </div>
           </div>
         )}
-      </div>
 
-      {/* Quick reply chips */}
-      <div style={{ background: '#f2f2f7', padding: '8px 12px 16px', minHeight: 56, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {options ? (
-          options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => pick(opt)}
-              style={{
-                background: '#fff', border: '1px solid rgba(27,42,74,0.2)', borderRadius: 20,
-                padding: '7px 14px', fontSize: 12, fontWeight: 500, color: '#1B2A4A',
-                cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(27,42,74,0.06)')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#fff')}
-            >
-              {opt.label}
-            </button>
-          ))
-        ) : (
-          <div style={{ flex: 1, background: '#fff', borderRadius: 20, padding: '8px 14px', fontSize: 13, color: '#aaa', border: '1px solid rgba(0,0,0,0.1)' }}>
-            iMessage
+        {options && !typing && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, marginTop: 4 }}>
+            {options.map((opt, i) => (
+              <button
+                key={i}
+                onClick={() => pick(opt)}
+                style={{
+                  background: '#fff', border: '1.5px solid rgba(27,42,74,0.25)', borderRadius: 18,
+                  padding: '7px 14px', fontSize: 13, fontWeight: 500, color: '#1B2A4A',
+                  cursor: 'pointer', transition: 'background 0.15s, border-color 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(27,42,74,0.06)'; e.currentTarget.style.borderColor = 'rgba(27,42,74,0.5)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'rgba(27,42,74,0.25)' }}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
         )}
+      </div>
+
+      {/* Input bar — always static */}
+      <div style={{ background: '#f2f2f7', padding: '8px 12px 16px', display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ flex: 1, background: '#fff', borderRadius: 20, padding: '8px 14px', fontSize: 13, color: '#aaa', border: '1px solid rgba(0,0,0,0.1)' }}>
+          iMessage
+        </div>
+        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#e0e0e5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M1 6 L11 6 M7 2 L11 6 L7 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
       </div>
     </div>
   )
