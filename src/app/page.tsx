@@ -635,7 +635,7 @@ const integrations = [
   { name: 'Dialpad',      src: '/logos/dialpad-logo.png' },
   { name: 'Grasshopper',  src: '/logos/grasshopper-logo-removebg-preview.png' },
   { name: 'Vonage',       src: '/logos/vonage-logo-removebg-preview.png' },
-  { name: 'Nextiva',      src: '/logos/nextiva-logo.png' },
+  { name: 'Nextiva',      src: '/logos/nextiva-logo-removebg-preview.png' },
   { name: 'Ooma',         src: '/logos/ooma-logo-removebg-preview.png' },
 ]
 
