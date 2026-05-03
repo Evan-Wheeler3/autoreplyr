@@ -721,6 +721,13 @@ const integrations = [
   { name: 'RingCentral',  src: '/logos/ringcentral-logo.png' },
   { name: 'Google Voice', src: '/logos/googlevoice-logo.png' },
   { name: 'Dialpad',      src: '/logos/dialpad-logo.png' },
+  { name: 'Grasshopper',  src: '/logos/grasshopper-logo.png' },
+  { name: 'Vonage',       src: '/logos/vonage-logo.png' },
+  { name: 'Nextiva',      src: '/logos/nextiva-logo.png' },
+  { name: 'Ooma',         src: '/logos/ooma-logo.png' },
+  { name: 'Verizon',      src: '/logos/verizon-logo.png' },
+  { name: 'AT&T',         src: '/logos/att-logo.png' },
+  { name: 'T-Mobile',     src: '/logos/tmobile-logo.png' },
 ]
 
 function IntegrationsStrip() {
@@ -729,7 +736,7 @@ function IntegrationsStrip() {
     <div style={{ background: '#f4f6f9', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3', padding: '28px 0' }}>
       {/* Works with label */}
       <p className="text-xs font-bold tracking-widest uppercase text-center mb-6" style={{ color: '#94a3b8' }}>
-        Works with
+        Keep your existing number
       </p>
 
       {/* Marquee container */}
