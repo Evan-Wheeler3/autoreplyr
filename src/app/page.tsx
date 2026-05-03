@@ -711,18 +711,19 @@ const steps = [
 
 /* ─── Integrations Strip ─────────────────────────────────────────────────────── */
 
+// Simple Icons slugs + brand colors
 const integrations = [
-  { name: 'OpenPhone',    domain: 'openphone.com' },
-  { name: 'Twilio',       domain: 'twilio.com' },
-  { name: 'RingCentral',  domain: 'ringcentral.com' },
-  { name: 'Google Voice', domain: 'voice.google.com' },
-  { name: 'Grasshopper',  domain: 'grasshopper.com' },
-  { name: 'Dialpad',      domain: 'dialpad.com' },
+  { name: 'OpenPhone',    slug: 'openphone',    color: '1a1a2e' },
+  { name: 'Twilio',       slug: 'twilio',       color: 'F22F46' },
+  { name: 'RingCentral',  slug: 'ringcentral',  color: 'FF8800' },
+  { name: 'Google Voice', slug: 'googlevoice',  color: '4285F4' },
+  { name: 'Grasshopper',  slug: 'grasshopper',  color: '6DBF4A' },
+  { name: 'Dialpad',      slug: 'dialpad',      color: '6940FF' },
 ]
 
 function IntegrationsStrip() {
   return (
-    <div style={{ background: '#f4f6f9', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3', padding: '20px 0', overflow: 'hidden' }}>
+    <div style={{ background: '#f4f6f9', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3', padding: '24px 0' }}>
       <div className="max-w-6xl mx-auto px-8">
         <div className="flex items-center gap-10 flex-wrap justify-between">
           <p className="text-xs font-bold tracking-widest uppercase shrink-0" style={{ color: '#94a3b8' }}>
@@ -730,16 +731,16 @@ function IntegrationsStrip() {
           </p>
           <div className="flex items-center gap-8 flex-wrap">
             {integrations.map((int) => (
-              <div key={int.name} className="flex items-center gap-2.5 opacity-50 hover:opacity-100 transition-opacity duration-200">
+              <div key={int.name} className="flex items-center gap-2.5 opacity-50 hover:opacity-90 transition-opacity duration-200">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`https://logo.clearbit.com/${int.domain}`}
+                  src={`https://cdn.simpleicons.org/${int.slug}/${int.color}`}
                   alt={int.name}
-                  width={28}
-                  height={28}
-                  style={{ borderRadius: 6, objectFit: 'contain' }}
+                  width={24}
+                  height={24}
+                  style={{ objectFit: 'contain', flexShrink: 0 }}
                 />
-                <span className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{int.name}</span>
+                <span className="text-sm font-semibold whitespace-nowrap" style={{ color: '#1B2A4A' }}>{int.name}</span>
               </div>
             ))}
           </div>
