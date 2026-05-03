@@ -261,77 +261,37 @@ function Navbar() {
       <div className="flex items-center gap-2.5">
         <Image src="/logo.png" alt="AutoReplyr" width={32} height={32} className="object-contain"
           style={{ background: 'white', borderRadius: 6 }} />
-        <span
-          className="font-bold text-lg tracking-tight transition-colors duration-300"
-          style={{ color: scrolled ? '#1B2A4A' : '#1B2A4A' }}
-        >
+        <span className="font-bold text-lg tracking-tight" style={{ color: '#1B2A4A' }}>
           AutoReplyr
         </span>
+      </div>
+
+      <div className="hidden sm:flex items-center gap-6">
+        {[
+          { label: 'How it Works', id: 'how-it-works' },
+          { label: 'Use Cases',    id: 'use-cases' },
+        ].map(({ label, id }) => (
+          <button
+            key={id}
+            onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
+            className="text-sm font-medium transition-colors duration-200"
+            style={{ color: scrolled ? '#475569' : '#475569', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            {label}
+          </button>
+        ))}
+        <button
+          onClick={() => document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })}
+          className="text-sm font-bold px-4 py-2 rounded-full transition-all duration-200"
+          style={{ background: '#E0001B', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 2px 10px rgba(224,0,27,0.3)' }}
+        >
+          Join!
+        </button>
       </div>
     </nav>
   )
 }
 
-/* ─── Scrolling Plane ─────────────────────────────────────────────────────── */
-
-function ScrollingPlane() {
-  const scrollY = useScrollY()
-  const [maxScroll, setMaxScroll] = useState(1)
-  const [hovered, setHovered] = useState(false)
-
-  useEffect(() => {
-    setMaxScroll(document.documentElement.scrollHeight - window.innerHeight)
-  }, [])
-
-  const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0
-  const yVh = 8 + progress * 80
-
-  function handleClick() {
-    document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  return (
-    <div
-      className="fixed z-40 hidden xl:flex items-center gap-2"
-      style={{
-        top: `${yVh}vh`,
-        right: '2vw',
-        cursor: 'pointer',
-        transition: 'top 0.08s linear',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={handleClick}
-    >
-      {hovered && (
-        <div style={{
-          background: '#E0001B',
-          color: '#fff',
-          fontSize: 12,
-          fontWeight: 700,
-          padding: '5px 12px',
-          borderRadius: 20,
-          whiteSpace: 'nowrap',
-          boxShadow: '0 2px 12px rgba(224,0,27,0.35)',
-          letterSpacing: '0.02em',
-        }}>
-          Join Waitlist →
-        </div>
-      )}
-      <div style={{
-        transform: `scale(${hovered ? 1.15 : 1})`,
-        transition: 'transform 0.15s ease',
-        width: 56, height: 56, borderRadius: '50%',
-        background: 'rgba(255,255,255,0.18)',
-        backdropFilter: 'blur(6px)',
-        boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <Image src="/plane.png" alt="Join Waitlist" width={36} height={36} className="object-contain" />
-      </div>
-    </div>
-  )
-}
 
 /* ─── Hero ──────────────────────────────────────────────────────────────────── */
 
@@ -737,7 +697,7 @@ function IntegrationsStrip() {
 function HowItWorks() {
   const { ref, inView } = useInView(0.1)
   return (
-    <section className="py-20 px-8" style={{ background: '#f4f6f9' }}>
+    <section id="how-it-works" className="py-20 px-8" style={{ background: '#f4f6f9' }}>
       <div className="max-w-6xl mx-auto">
         <div ref={ref} className="mb-12">
           <p
@@ -878,7 +838,7 @@ function UseCases() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="py-20 px-8" style={{ background: '#ffffff' }}>
+    <section id="use-cases" className="py-20 px-8" style={{ background: '#ffffff' }}>
       <div className="max-w-5xl mx-auto">
         <div ref={ref} className="mb-10">
           <p className="text-xs font-bold tracking-widest uppercase mb-4"
@@ -1130,7 +1090,6 @@ export default function Home() {
   return (
     <main>
       <Navbar />
-      <ScrollingPlane />
       <Hero />
       <IntegrationsStrip />
       <StickyStory />
