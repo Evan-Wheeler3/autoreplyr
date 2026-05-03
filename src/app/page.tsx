@@ -711,14 +711,77 @@ const steps = [
 
 /* ─── Integrations Strip ─────────────────────────────────────────────────────── */
 
-// Simple Icons slugs + brand colors
-const integrations = [
-  { name: 'OpenPhone',    slug: 'openphone',    color: '1a1a2e' },
-  { name: 'Twilio',       slug: 'twilio',       color: 'F22F46' },
-  { name: 'RingCentral',  slug: 'ringcentral',  color: 'FF8800' },
-  { name: 'Google Voice', slug: 'googlevoice',  color: '4285F4' },
-  { name: 'Grasshopper',  slug: 'grasshopper',  color: '6DBF4A' },
-  { name: 'Dialpad',      slug: 'dialpad',      color: '6940FF' },
+const integrations: { name: string; icon: React.ReactNode }[] = [
+  {
+    name: 'OpenPhone',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="6" fill="#1A1A2E"/>
+        <path d="M12 5.5C8.96 5.5 6.5 7.96 6.5 11c0 1.9.9 3.6 2.3 4.7L8 17.5l3-1A5.5 5.5 0 1 0 12 5.5zm0 9.5a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="white"/>
+        <circle cx="12" cy="11" r="1.8" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Twilio',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="6" fill="#F22F46"/>
+        <circle cx="12" cy="12" r="5.5" stroke="white" strokeWidth="1.8" fill="none"/>
+        <circle cx="9.5" cy="9.5" r="1.4" fill="white"/>
+        <circle cx="14.5" cy="9.5" r="1.4" fill="white"/>
+        <circle cx="9.5" cy="14.5" r="1.4" fill="white"/>
+        <circle cx="14.5" cy="14.5" r="1.4" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'RingCentral',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="6" fill="#FF8800"/>
+        <circle cx="12" cy="12" r="6" stroke="white" strokeWidth="1.8" fill="none"/>
+        <circle cx="12" cy="12" r="3.2" stroke="white" strokeWidth="1.8" fill="none"/>
+        <circle cx="12" cy="12" r="1.2" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Google Voice',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="6" fill="white" stroke="#e8edf3" strokeWidth="1"/>
+        <path d="M12 4.5C8.41 4.5 5.5 7.41 5.5 11c0 2.05.96 3.87 2.46 5.06L7 19.5l3.13-1.56A6.43 6.43 0 0 0 12 18c3.59 0 6.5-2.91 6.5-6.5S15.59 4.5 12 4.5z" fill="#4285F4"/>
+        <path d="M12 4.5C8.41 4.5 5.5 7.41 5.5 11c0 2.05.96 3.87 2.46 5.06L7 19.5l3.13-1.56A6.43 6.43 0 0 0 12 18V4.5z" fill="#34A853"/>
+        <circle cx="12" cy="11" r="2.5" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Grasshopper',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="6" fill="#5CB85C"/>
+        <path d="M7 15.5c0-2.76 2.24-5 5-5 .9 0 1.74.24 2.46.66V9.5H17v6h-6v-1.5h3.6A3.5 3.5 0 0 0 12 12a3.5 3.5 0 0 0-3.5 3.5H7z" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Dialpad',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect width="24" height="24" rx="6" fill="#6940FF"/>
+        <circle cx="9" cy="9" r="1.5" fill="white"/>
+        <circle cx="12" cy="9" r="1.5" fill="white"/>
+        <circle cx="15" cy="9" r="1.5" fill="white"/>
+        <circle cx="9" cy="12" r="1.5" fill="white"/>
+        <circle cx="12" cy="12" r="1.5" fill="white"/>
+        <circle cx="15" cy="12" r="1.5" fill="white"/>
+        <circle cx="9" cy="15" r="1.5" fill="white"/>
+        <circle cx="12" cy="15" r="1.5" fill="white"/>
+      </svg>
+    ),
+  },
 ]
 
 function IntegrationsStrip() {
@@ -732,14 +795,7 @@ function IntegrationsStrip() {
           <div className="flex items-center gap-8 flex-wrap">
             {integrations.map((int) => (
               <div key={int.name} className="flex items-center gap-2.5 opacity-50 hover:opacity-90 transition-opacity duration-200">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`https://cdn.simpleicons.org/${int.slug}/${int.color}`}
-                  alt={int.name}
-                  width={24}
-                  height={24}
-                  style={{ objectFit: 'contain', flexShrink: 0 }}
-                />
+                {int.icon}
                 <span className="text-sm font-semibold whitespace-nowrap" style={{ color: '#1B2A4A' }}>{int.name}</span>
               </div>
             ))}
