@@ -321,7 +321,7 @@ function ScrollingPlane() {
       <div style={{
         transform: `scale(${hovered ? 1.15 : 1})`,
         transition: 'transform 0.15s ease',
-        filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5))',
+        filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5)) drop-shadow(0 0 12px rgba(255,255,255,0.9)) drop-shadow(0 0 24px rgba(255,255,255,0.5))',
         opacity: hovered ? 1 : 0.92,
       }}>
         <Image src="/plane.png" alt="Join Waitlist" width={48} height={48} className="object-contain" />
