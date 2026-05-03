@@ -709,6 +709,103 @@ const steps = [
   },
 ]
 
+/* ─── Integrations Strip ─────────────────────────────────────────────────────── */
+
+const integrations = [
+  {
+    name: 'OpenPhone',
+    logo: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#1A1A2E"/>
+        <path d="M16 7C11.58 7 8 10.58 8 15c0 2.6 1.22 4.92 3.12 6.42L10 25l4.1-1.35A8 8 0 1 0 16 7zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13z" fill="white"/>
+        <circle cx="16" cy="15" r="3" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Twilio',
+    logo: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#F22F46"/>
+        <circle cx="16" cy="16" r="7" stroke="white" strokeWidth="2.5" fill="none"/>
+        <circle cx="12.5" cy="12.5" r="2" fill="white"/>
+        <circle cx="19.5" cy="12.5" r="2" fill="white"/>
+        <circle cx="12.5" cy="19.5" r="2" fill="white"/>
+        <circle cx="19.5" cy="19.5" r="2" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'RingCentral',
+    logo: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#0073AE"/>
+        <path d="M16 8a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8zm0 2.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 2.5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Google Voice',
+    logo: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#4285F4"/>
+        <path d="M22 13.5C22 17.09 19.31 20 16 20c-.45 0-.89-.05-1.31-.14L12 23v-3.35C10.17 18.44 9 16.09 9 13.5 9 9.91 12.13 7 16 7s6 2.91 6 6.5z" fill="white"/>
+        <circle cx="16" cy="13.5" r="2.5" fill="#4285F4"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Grasshopper',
+    logo: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#6DBF4A"/>
+        <path d="M9 20c0-4.42 3.13-8 7-8 1.5 0 2.89.5 4 1.35V11h2v8h-8v-2h5.3A5.07 5.07 0 0 0 16 14c-2.76 0-5 2.24-5 5v1H9v-1z" fill="white"/>
+      </svg>
+    ),
+  },
+  {
+    name: 'Dialpad',
+    logo: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#7C4DFF"/>
+        <circle cx="12" cy="12" r="2" fill="white"/>
+        <circle cx="16" cy="12" r="2" fill="white"/>
+        <circle cx="20" cy="12" r="2" fill="white"/>
+        <circle cx="12" cy="16" r="2" fill="white"/>
+        <circle cx="16" cy="16" r="2" fill="white"/>
+        <circle cx="20" cy="16" r="2" fill="white"/>
+        <circle cx="12" cy="20" r="2" fill="white"/>
+        <circle cx="16" cy="20" r="2" fill="white"/>
+        <circle cx="20" cy="20" r="2" fill="white"/>
+      </svg>
+    ),
+  },
+]
+
+function IntegrationsStrip() {
+  return (
+    <div style={{ background: '#f4f6f9', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3', padding: '20px 0', overflow: 'hidden' }}>
+      <div className="max-w-6xl mx-auto px-8">
+        <div className="flex items-center gap-10 flex-wrap justify-between">
+          <p className="text-xs font-bold tracking-widest uppercase shrink-0" style={{ color: '#94a3b8' }}>
+            Works with
+          </p>
+          <div className="flex items-center gap-8 flex-wrap">
+            {integrations.map((int) => (
+              <div key={int.name} className="flex items-center gap-2.5 opacity-60 hover:opacity-100 transition-opacity duration-200">
+                {int.logo}
+                <span className="text-sm font-semibold" style={{ color: '#1B2A4A' }}>{int.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── How It Works ───────────────────────────────────────────────────────────── */
+
 function HowItWorks() {
   const { ref, inView } = useInView(0.1)
   return (
@@ -1016,6 +1113,7 @@ export default function Home() {
       <Navbar />
       <ScrollingPlane />
       <Hero />
+      <IntegrationsStrip />
       <StickyStory />
       <HowItWorks />
       <WhoItsFor />
