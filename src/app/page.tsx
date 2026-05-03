@@ -249,8 +249,7 @@ function Navbar() {
       }}
     >
       <div className="flex items-center gap-2.5">
-        <Image src="/logo.png" alt="AutoReplyr" width={32} height={32} className="object-contain"
-          style={{ background: 'white', borderRadius: 6 }} />
+        <Image src="/logo-removebg-preview.png" alt="AutoReplyr" width={32} height={32} className="object-contain" />
         <span className="font-bold text-lg tracking-tight" style={{ color: '#1B2A4A' }}>
           AutoReplyr
         </span>
@@ -349,7 +348,7 @@ function Hero() {
           opacity: 0.12,
         }}
       >
-        <Image src="/logo.png" alt="" fill className="object-contain" sizes="60vmin" priority />
+        <Image src="/logo-removebg-preview.png" alt="" fill className="object-contain" sizes="60vmin" priority />
       </div>
 
       {/* Content */}
