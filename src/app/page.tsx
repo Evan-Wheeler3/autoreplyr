@@ -752,12 +752,13 @@ function IntegrationsStrip() {
         }}>
           {items.map((int, i) => (
             <div key={i} className="flex items-center gap-3 mx-10">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={int.src}
                 alt={int.name}
                 width={44}
                 height={44}
-                style={{ objectFit: 'contain', borderRadius: 8 }}
+                style={{ objectFit: 'contain', borderRadius: 6, mixBlendMode: 'multiply' }}
               />
               <span className="text-base font-semibold whitespace-nowrap" style={{ color: '#1B2A4A' }}>{int.name}</span>
             </div>
