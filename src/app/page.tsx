@@ -71,8 +71,6 @@ const PREVIEW = [
   { from: 'them' as const, text: 'Hi, sorry we missed your call at Riverside HVAC. Reply YES for a quick response. Reply STOP to opt out.', delay: 300 },
   { from: 'me'   as const, text: 'YES', delay: 1100 },
   { from: 'them' as const, text: 'What type of service do you need?', delay: 1800 },
-  { from: 'me'   as const, text: 'My AC stopped working last night', delay: 2700 },
-  { from: 'them' as const, text: "Got it — that's urgent. The team has been notified and will reach out shortly!", delay: 3500 },
 ]
 
 interface ChatMsg { from: 'them' | 'me'; text: string }
@@ -80,24 +78,16 @@ interface Option { label: string; response: string; next?: Option[] }
 
 const FLOW: Option[] = [
   {
-    label: 'How soon can someone come?',
-    response: "You're first on the list. Expect a call within 30–60 minutes.",
-    next: [
-      { label: 'Perfect, thanks!', response: 'Of course! We\'ll be in touch shortly.' },
-      { label: 'Can someone come today?', response: 'Yes — a tech is already in your area today.' },
-    ],
+    label: 'Repair / Emergency',
+    response: "Got it, we are treating this as urgent. A technician will be reaching out to you within the next 30 minutes. Can you share your address so we can get someone headed your way?",
   },
   {
-    label: 'What will it cost?',
-    response: "Pricing depends on the issue. Our tech gives you an exact quote on-site — no surprises.",
-    next: [
-      { label: 'Sounds fair', response: 'Great! We\'ll be in touch soon.' },
-      { label: 'Do you offer financing?', response: 'Yes — same-day financing is available. Ask the tech when they arrive.' },
-    ],
+    label: 'Get a quote',
+    response: "No problem at all. You can get an instant quote right here: riverside-hvac.com/quote. Someone will also follow up to answer any questions.",
   },
   {
-    label: "Thanks, I'll wait for the call",
-    response: "We'll be in touch soon! Reply anytime if anything changes.",
+    label: 'Schedule a visit',
+    response: "Sounds great. You can pick a time that works for you right here: calendly.com/riverside-hvac. We look forward to seeing you.",
   },
 ]
 
@@ -397,10 +387,9 @@ function Hero() {
                 transition: 'opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s',
               }}
             >
-              You missed<br />
-              the call.<br />
-              <span style={{ color: '#E0001B' }}>We sent</span><br />
-              <span style={{ color: '#E0001B' }}>the text.</span>
+              Missed Calls<br />
+              Shouldn&apos;t Mean<br />
+              <span style={{ color: '#E0001B' }}>Lost Revenue.</span>
             </h1>
 
             {/* Sub */}
@@ -413,7 +402,7 @@ function Hero() {
                 transition: 'opacity 0.7s ease 0.22s, transform 0.7s ease 0.22s',
               }}
             >
-              AutoReplyr texts your missed callers back in seconds — automatically qualifying leads while you&apos;re on the job.
+              AutoReplyr texts your missed callers back in seconds. Qualifying leads while you&apos;re on the job.
             </p>
 
             {/* Form */}
@@ -528,7 +517,7 @@ const story = [
   {
     stat: '62%',
     headline: 'of your missed callers never call back.',
-    sub: 'They hang up, open Google, and dial the next contractor on the list.',
+    sub: 'Instead they move on to your competitors.',
     color: '#E0001B',
   },
   {
@@ -539,8 +528,8 @@ const story = [
   },
   {
     stat: 'Instant',
-    headline: 'We respond before they try anyone else.',
-    sub: 'The moment the call ends, AutoReplyr fires. Before they\'ve put their phone down.',
+    headline: 'AutoReplyr responds to missed calls instantly.',
+    sub: 'SMS follow-ups qualify and capture your leads.',
     color: '#E0001B',
   },
 ]
@@ -603,11 +592,11 @@ function StickyStory() {
           </div>
           <h2
             className="font-bold mb-4"
-            style={{ fontSize: 'clamp(24px, 3.5vw, 44px)', color: index === 1 ? '#1B2A4A' : '#ffffff', lineHeight: 1.2, letterSpacing: -1 }}
+            style={{ fontSize: 'clamp(24px, 3.5vw, 44px)', color: index === 1 ? '#1B2A4A' : '#ffffff', lineHeight: 1.2, letterSpacing: -1, textWrap: 'balance' } as React.CSSProperties}
           >
             {slide.headline}
           </h2>
-          <p style={{ fontSize: 18, color: index === 1 ? 'rgba(27,42,74,0.55)' : 'rgba(255,255,255,0.7)', maxWidth: 560, margin: '0 auto' }}>
+          <p style={{ fontSize: 18, color: index === 1 ? 'rgba(27,42,74,0.55)' : 'rgba(255,255,255,0.7)', maxWidth: 560, margin: '0 auto', textWrap: 'balance' } as React.CSSProperties}>
             {slide.sub}
           </p>
         </div>
@@ -800,36 +789,17 @@ const useCases = [
   {
     title: 'Field Service',
     preview: 'You\'re on a job site. A new customer calls. AutoReplyr texts them back instantly so you don\'t lose the lead.',
-    examples: [
-      { industry: 'HVAC', detail: 'Customer calls about a broken AC in July. You\'re on another job. AutoReplyr texts back, qualifies the urgency, and books them before they call your competitor.' },
-      { industry: 'Plumbing', detail: 'A burst pipe call at 7am. You\'re unavailable. AutoReplyr captures their info, confirms the emergency, and flags it as high intent so you call back first.' },
-      { industry: 'Roofing', detail: 'Storm damage leads flood in. AutoReplyr works through every missed call overnight, qualifying jobs by size and timeline while you sleep.' },
-      { industry: 'Electrical', detail: 'A homeowner needs a panel upgrade quote. AutoReplyr collects address, scope, and timeline — so your estimate call is already prepped.' },
-      { industry: 'Pest Control', detail: 'Seasonal surge in mosquito calls. AutoReplyr handles the volume, books consultations, and filters out the tire-kickers.' },
-      { industry: 'Landscaping', detail: 'Spring cleanups are in demand. AutoReplyr captures every inquiry, asks about property size and service type, and builds your schedule.' },
-    ],
+    body: 'When you\'re on a job, every unanswered call is a potential customer lost. AutoReplyr texts back the moment a call is missed, asks what they need, and qualifies their urgency before you\'ve even put down your tools. High-intent leads get flagged immediately so you know who to call back first. You stay focused on the work. AutoReplyr handles the pipeline.',
   },
   {
     title: 'Customer Support',
     preview: 'After-hours calls and support lines don\'t have to go to voicemail. AutoReplyr captures issues and keeps customers informed.',
-    examples: [
-      { industry: 'Retail & E-commerce', detail: 'Customer calls about a missing order after hours. AutoReplyr acknowledges the issue, collects their order number, and sets expectations for a callback.' },
-      { industry: 'Property Management', detail: 'Tenant calls about a maintenance issue. AutoReplyr logs the issue, confirms urgency, and routes high-priority requests for immediate follow-up.' },
-      { industry: 'Healthcare (non-clinical)', detail: 'Patient calls to reschedule an appointment. AutoReplyr captures their preferred time and flags it for staff — no hold music, no voicemail.' },
-      { industry: 'Auto Repair', detail: 'Customer calls to check on their car. AutoReplyr lets them know it\'s being looked into and that someone will follow up with a status update.' },
-      { industry: 'Home Cleaning', detail: 'Client needs to reschedule a recurring clean. AutoReplyr captures the request and confirms receipt so they don\'t feel ignored.' },
-    ],
+    body: 'Customers who can\'t reach you don\'t just wait. They get frustrated and look elsewhere. AutoReplyr steps in when your team is unavailable, acknowledges the customer right away, and gathers the details you\'ll need to follow up. Issues get logged, urgency gets confirmed, and your customers feel heard even when no one is there to answer. Fewer drop-offs. Better experiences.',
   },
   {
     title: 'Sales',
     preview: 'Inbound leads are hottest the moment they call. AutoReplyr keeps them engaged and scores intent before you pick up the phone.',
-    examples: [
-      { industry: 'Home Improvement', detail: 'A homeowner calls for a remodel quote. AutoReplyr asks about scope, budget range, and timeline — so your sales call starts warm, not cold.' },
-      { industry: 'Insurance', detail: 'A prospect calls after seeing an ad. AutoReplyr captures their coverage needs and flags high-intent leads for immediate agent follow-up.' },
-      { industry: 'Real Estate', detail: 'A buyer calls about a listing. AutoReplyr qualifies their timeline, pre-approval status, and price range before you call back.' },
-      { industry: 'Solar / Energy', detail: 'Inbound call from a homeowner interested in solar. AutoReplyr pre-qualifies ownership, roof type, and monthly bill — the key sales signals.' },
-      { industry: 'Gyms & Fitness', detail: 'Prospect calls about membership pricing. AutoReplyr answers common questions, captures their goals, and books a tour or trial.' },
-    ],
+    body: 'Inbound leads go cold fast. AutoReplyr responds in seconds, keeps the conversation going, and asks the qualifying questions that matter: budget, timeline, and what they\'re looking for. By the time you call back, you already know who\'s serious and who\'s browsing. Your sales calls start warm. Your close rate goes up. And no lead slips through because you were busy.',
   },
 ]
 
@@ -932,20 +902,15 @@ function UseCaseCard({
         </div>
       </button>
 
-      {/* Expandable examples */}
+      {/* Expandable body */}
       <div style={{
-        maxHeight: isOpen ? 1000 : 0,
+        maxHeight: isOpen ? 300 : 0,
         overflow: 'hidden',
         transition: 'max-height 0.4s cubic-bezier(0.22,1,0.36,1)',
       }}>
-        <div className="grid sm:grid-cols-2 gap-3 px-8 pb-8">
-          {useCase.examples.map((ex, j) => (
-            <div key={j} style={{ background: '#f8fafc', borderRadius: 12, padding: '16px 20px', border: '1px solid #e8edf3' }}>
-              <div className="text-sm font-bold mb-1" style={{ color: '#1B2A4A' }}>{ex.industry}</div>
-              <div className="text-sm leading-relaxed" style={{ color: '#64748b' }}>{ex.detail}</div>
-            </div>
-          ))}
-        </div>
+        <p className="text-sm leading-relaxed px-8 pb-8" style={{ color: '#64748b', maxWidth: 680 }}>
+          {useCase.body}
+        </p>
       </div>
     </div>
   )
