@@ -798,14 +798,15 @@ const useCases = [
   },
   {
     title: 'Sales',
-    preview: 'Inbound leads are hottest the moment they call. AutoReplyr keeps them engaged and scores intent before you pick up the phone.',
+    preview: 'Inbound leads are hottest the moment they call. When they hit voicemail, AutoReplyr texts back instantly, keeps them engaged, and scores their intent so you know who to call first.',
     body: 'Inbound leads go cold fast. AutoReplyr responds in seconds, keeps the conversation going, and asks the qualifying questions that matter: budget, timeline, and what they\'re looking for. By the time you call back, you already know who\'s serious and who\'s browsing. Your sales calls start warm. Your close rate goes up. And no lead slips through because you were busy.',
   },
 ]
 
 function UseCases() {
   const { ref, inView } = useInView(0.1)
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const anyOpen = openIndex !== null
 
   return (
     <section id="use-cases" className="py-20 px-8" style={{ background: '#ffffff' }}>
@@ -830,13 +831,14 @@ function UseCases() {
           </h2>
         </div>
 
-        <div style={{ display: 'flex', gap: 16, alignItems: 'stretch', minHeight: 300 }}>
+        <div style={{ display: 'flex', gap: 12, height: 380 }}>
           {useCases.map((uc, i) => (
             <UseCaseCard
               key={i}
               useCase={uc}
               index={i}
               isOpen={openIndex === i}
+              anyOpen={anyOpen}
               onToggle={() => setOpenIndex(openIndex === i ? null : i)}
             />
           ))}
@@ -847,77 +849,99 @@ function UseCases() {
 }
 
 function UseCaseCard({
-  useCase, index, isOpen, onToggle,
+  useCase, index, isOpen, anyOpen, onToggle,
 }: {
   useCase: typeof useCases[number]
   index: number
   isOpen: boolean
+  anyOpen: boolean
   onToggle: () => void
 }) {
+  const collapsed = anyOpen && !isOpen
+
   return (
     <div
       onClick={onToggle}
       style={{
-        flex: isOpen ? 4 : 1,
-        minWidth: 0,
+        flex: isOpen ? 4 : collapsed ? '0 0 72px' : 1,
+        height: '100%',
         border: isOpen ? '1.5px solid #E0001B' : '1.5px solid #e8edf3',
         borderRadius: 20,
-        background: isOpen ? 'rgba(224,0,27,0.02)' : '#ffffff',
+        background: isOpen ? 'rgba(224,0,27,0.02)' : collapsed ? '#fafafa' : '#ffffff',
         cursor: 'pointer',
-        padding: 32,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        transition: 'flex 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.25s ease, background 0.25s ease',
         overflow: 'hidden',
+        position: 'relative',
+        transition: 'flex 0.55s cubic-bezier(0.22,1,0.36,1), border-color 0.25s ease, background 0.25s ease',
       }}
     >
-      <div>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: 'rgba(224,0,27,0.4)' }}>
-          0{index + 1}
-        </span>
-        <h3
-          style={{
-            fontSize: isOpen ? 22 : 17,
-            fontWeight: 700,
-            color: '#1B2A4A',
-            letterSpacing: -0.5,
-            marginTop: 10,
-            whiteSpace: isOpen ? 'normal' : 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            transition: 'font-size 0.3s ease',
-          }}
-        >
-          {useCase.title}
-        </h3>
-
-        {isOpen && (
-          <div style={{ marginTop: 16 }}>
-            <p style={{ fontSize: 14, fontWeight: 500, color: '#475569', marginBottom: 12, lineHeight: 1.6 }}>
-              {useCase.preview}
-            </p>
-            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.75 }}>
-              {useCase.body}
-            </p>
+      {/* Default state: equal thirds, title + teaser */}
+      <div style={{
+        position: 'absolute', inset: 0, padding: 32,
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        opacity: !anyOpen ? 1 : 0,
+        transition: 'opacity 0.15s ease',
+        pointerEvents: !anyOpen ? 'auto' : 'none',
+      }}>
+        <div>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: 'rgba(224,0,27,0.4)' }}>0{index + 1}</span>
+          <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1B2A4A', letterSpacing: -0.5, marginTop: 10, marginBottom: 12 }}>
+            {useCase.title}
+          </h3>
+          <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.65, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            {useCase.preview}
+          </p>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f4f6f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+              <line x1="6" y1="1" x2="6" y2="11" stroke="#1B2A4A" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="1" y1="6" x2="11" y2="6" stroke="#1B2A4A" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
           </div>
-        )}
+        </div>
       </div>
 
-      <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
-        <div
-          style={{
-            width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-            background: isOpen ? '#E0001B' : '#f4f6f9',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'background 0.2s ease, transform 0.2s ease',
-            transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-          }}
-        >
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-            <line x1="6" y1="1" x2="6" y2="11" stroke={isOpen ? 'white' : '#1B2A4A'} strokeWidth="2" strokeLinecap="round"/>
-            <line x1="1" y1="6" x2="11" y2="6" stroke={isOpen ? 'white' : '#1B2A4A'} strokeWidth="2" strokeLinecap="round"/>
-          </svg>
+      {/* Collapsed tab: rotated title */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14,
+        opacity: collapsed ? 1 : 0,
+        transition: 'opacity 0.2s ease',
+        pointerEvents: collapsed ? 'auto' : 'none',
+      }}>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'rgba(224,0,27,0.4)' }}>0{index + 1}</span>
+        <p style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: 14, fontWeight: 700, color: '#1B2A4A', whiteSpace: 'nowrap', letterSpacing: -0.3 }}>
+          {useCase.title}
+        </p>
+      </div>
+
+      {/* Open state: full content */}
+      <div style={{
+        position: 'absolute', inset: 0, padding: 40,
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        opacity: isOpen ? 1 : 0,
+        transition: isOpen ? 'opacity 0.25s ease 0.3s' : 'opacity 0.15s ease',
+        pointerEvents: isOpen ? 'auto' : 'none',
+      }}>
+        <div>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: 'rgba(224,0,27,0.4)' }}>0{index + 1}</span>
+          <h3 style={{ fontSize: 26, fontWeight: 700, color: '#1B2A4A', letterSpacing: -0.8, marginTop: 10, marginBottom: 16 }}>
+            {useCase.title}
+          </h3>
+          <p style={{ fontSize: 15, fontWeight: 500, color: '#334155', lineHeight: 1.65, marginBottom: 14 }}>
+            {useCase.preview}
+          </p>
+          <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.8 }}>
+            {useCase.body}
+          </p>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#E0001B', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(45deg)' }}>
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+              <line x1="6" y1="1" x2="6" y2="11" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="1" y1="6" x2="11" y2="6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
