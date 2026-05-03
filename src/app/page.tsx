@@ -658,7 +658,7 @@ function StickyStory() {
 const steps = [
   {
     n: '01', title: 'Customer calls. No answer.',
-    body: "You're on a job, driving, or just unavailable. The call goes unanswered — and without a fast response, that lead moves on to the next contractor on Google.",
+    body: "You're on a job, driving, or just unavailable. The call goes unanswered.",
     icon: (
       /* Missed call: coral circle, white phone + X */
       <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
@@ -671,7 +671,7 @@ const steps = [
   },
   {
     n: '02', title: 'AutoReplyr fires in seconds.',
-    body: 'The moment the call ends, AutoReplyr sends a personalized text from your number. Your caller hears from you before they\'ve even put their phone down.',
+    body: 'The moment the call ends, AutoReplyr sends a personalized text from your number.',
     icon: (
       /* Stopwatch: red outline with hand */
       <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
@@ -699,7 +699,7 @@ const steps = [
   },
   {
     n: '03', title: 'Lead captured. You get notified.',
-    body: 'AutoReplyr asks smart follow-up questions, scores the lead\'s intent, and sends you an instant alert when someone is ready to book. You call back with context — not cold.',
+    body: "AutoReplyr asks smart follow-up questions, scores the lead's intent, and sends you an instant alert when someone is ready to book.",
     icon: (
       /* Dollar sign */
       <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
