@@ -599,29 +599,22 @@ function StickyStory() {
       <div
         style={{
           position: 'sticky', top: 0, height: '100vh',
-          background: index === 1 ? '#1B2A4A' : '#0f1923',
+          background: index === 1 ? '#ffffff' : '#E0001B',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'background 0.6s ease',
           overflow: 'hidden',
         }}
       >
-        {/* Background noise texture */}
-        <div
-          style={{
-            position: 'absolute', inset: 0, opacity: 0.03,
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")',
-          }}
-        />
-
         {/* Progress dots */}
         <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8 }}>
           {story.map((_, i) => (
             <div
               key={i}
               style={{
-                width: i === index ? 24 : 6, height: 6,
-                borderRadius: 3,
-                background: i === index ? (story[i].color) : 'rgba(255,255,255,0.2)',
+                width: i === index ? 24 : 6, height: 6, borderRadius: 3,
+                background: i === index
+                  ? (index === 1 ? '#E0001B' : 'rgba(255,255,255,0.9)')
+                  : (index === 1 ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.3)'),
                 transition: 'all 0.4s ease',
               }}
             />
@@ -638,7 +631,7 @@ function StickyStory() {
             style={{
               fontSize: 'clamp(80px, 14vw, 180px)',
               lineHeight: 1,
-              color: slide.color,
+              color: index === 1 ? '#E0001B' : '#ffffff',
               letterSpacing: -4,
               transition: 'color 0.5s ease',
             }}
@@ -647,11 +640,11 @@ function StickyStory() {
           </div>
           <h2
             className="font-bold mb-4"
-            style={{ fontSize: 'clamp(24px, 3.5vw, 44px)', color: '#ffffff', lineHeight: 1.2, letterSpacing: -1 }}
+            style={{ fontSize: 'clamp(24px, 3.5vw, 44px)', color: index === 1 ? '#1B2A4A' : '#ffffff', lineHeight: 1.2, letterSpacing: -1 }}
           >
             {slide.headline}
           </h2>
-          <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.45)', maxWidth: 560, margin: '0 auto' }}>
+          <p style={{ fontSize: 18, color: index === 1 ? 'rgba(27,42,74,0.55)' : 'rgba(255,255,255,0.7)', maxWidth: 560, margin: '0 auto' }}>
             {slide.sub}
           </p>
         </div>
