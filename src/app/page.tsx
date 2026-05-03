@@ -827,9 +827,9 @@ function StepCard({ step, delay }: { step: typeof steps[number]; delay: number }
 /* ─── Stats ─────────────────────────────────────────────────────────────────── */
 
 const stats = [
-  { value: 62, suffix: '%', label: 'of callers never call back after a missed call' },
-  { value: 78, suffix: '%', label: 'of customers choose the first business to respond' },
-  { value: 3,  suffix: 'x', label: 'higher response rate via text vs. voicemail' },
+  { value: 62, suffix: '%', label: 'of callers never call back after a missed call',    theme: 'red' },
+  { value: 78, suffix: '%', label: 'of customers choose the first business to respond', theme: 'white' },
+  { value: 3,  suffix: 'x', label: 'higher response rate via text vs. voicemail',       theme: 'red' },
 ]
 
 function Stats() {
@@ -848,23 +848,24 @@ function Stats() {
 function StatCard({ stat, delay, active }: { stat: typeof stats[number]; delay: number; active: boolean }) {
   const { ref, inView } = useInView(0.05)
   const count = useCounter(stat.value, 2000, active)
+  const red = stat.theme === 'red'
   return (
     <div
       ref={ref}
       className="py-12 px-8 rounded-3xl text-center"
       style={{
-        background: '#ffffff',
-        border: '1px solid #e8edf3',
-        boxShadow: '0 2px 20px rgba(0,0,0,0.04)',
+        background: red ? '#E0001B' : '#ffffff',
+        border: red ? 'none' : '1px solid #e8edf3',
+        boxShadow: red ? '0 4px 24px rgba(224,0,27,0.25)' : '0 2px 20px rgba(0,0,0,0.04)',
         opacity: inView ? 1 : 0,
         transform: inView ? 'translateY(0)' : 'translateY(20px)',
         transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
       }}
     >
-      <div className="font-bold mb-3 tracking-tight" style={{ fontSize: 64, lineHeight: 1, color: '#E0001B', letterSpacing: -2 }}>
+      <div className="font-bold mb-3 tracking-tight" style={{ fontSize: 64, lineHeight: 1, color: red ? '#ffffff' : '#E0001B', letterSpacing: -2 }}>
         {count}{stat.suffix}
       </div>
-      <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>{stat.label}</p>
+      <p className="text-sm leading-relaxed" style={{ color: red ? 'rgba(255,255,255,0.8)' : '#64748b' }}>{stat.label}</p>
     </div>
   )
 }
