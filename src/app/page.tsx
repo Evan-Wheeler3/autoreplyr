@@ -721,13 +721,10 @@ const integrations = [
   { name: 'RingCentral',  src: '/logos/ringcentral-logo.png' },
   { name: 'Google Voice', src: '/logos/googlevoice-logo.png' },
   { name: 'Dialpad',      src: '/logos/dialpad-logo.png' },
-  { name: 'Grasshopper',  src: '/logos/grasshopper-logo.png' },
+  { name: 'Grasshopper',  src: '/logos/grasshopper-logo.webp' },
   { name: 'Vonage',       src: '/logos/vonage-logo.png' },
   { name: 'Nextiva',      src: '/logos/nextiva-logo.png' },
-  { name: 'Ooma',         src: '/logos/ooma-logo.png' },
-  { name: 'Verizon',      src: '/logos/verizon-logo.png' },
-  { name: 'AT&T',         src: '/logos/att-logo.png' },
-  { name: 'T-Mobile',     src: '/logos/tmobile-logo.png' },
+  { name: 'Ooma',         src: '/logos/ooma-logo.avif' },
 ]
 
 function IntegrationsStrip() {
