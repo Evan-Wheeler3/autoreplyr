@@ -629,14 +629,14 @@ const steps = [
 
 const integrations = [
   { name: 'Quo',          src: '/logos/quo-logo.png' },
-  { name: 'Twilio',       src: '/logos/twilio-logo.png' },
-  { name: 'RingCentral',  src: '/logos/ringcentral-logo.png' },
-  { name: 'Google Voice', src: '/logos/googlevoice-logo.png' },
+  { name: 'Twilio',       src: '/logos/twilio-logo-removebg-preview.png' },
+  { name: 'RingCentral',  src: '/logos/ringcentral-logo-removebg-preview.png' },
+  { name: 'Google Voice', src: '/logos/googlevoice-logo-removebg-preview.png' },
   { name: 'Dialpad',      src: '/logos/dialpad-logo.png' },
-  { name: 'Grasshopper',  src: '/logos/grasshopper-logo.png' },
-  { name: 'Vonage',       src: '/logos/vonage-logo.png' },
+  { name: 'Grasshopper',  src: '/logos/grasshopper-logo-removebg-preview.png' },
+  { name: 'Vonage',       src: '/logos/vonage-logo-removebg-preview.png' },
   { name: 'Nextiva',      src: '/logos/nextiva-logo.png' },
-  { name: 'Ooma',         src: '/logos/ooma-logo.png' },
+  { name: 'Ooma',         src: '/logos/ooma-logo-removebg-preview.png' },
 ]
 
 function IntegrationsStrip() {
@@ -670,7 +670,7 @@ function IntegrationsStrip() {
                 alt={int.name}
                 width={44}
                 height={44}
-                style={{ objectFit: 'contain', borderRadius: 6, mixBlendMode: 'multiply' }}
+                style={{ objectFit: 'contain', borderRadius: 6 }}
               />
               <span className="text-base font-semibold whitespace-nowrap" style={{ color: '#1B2A4A' }}>{int.name}</span>
             </div>
