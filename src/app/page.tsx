@@ -48,6 +48,17 @@ function useCounter(end: number, duration = 2200, active = false) {
   return count
 }
 
+function useIsMobile(breakpoint = 640) {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < breakpoint)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [breakpoint])
+  return isMobile
+}
+
 function useSectionProgress(ref: RefObject<HTMLDivElement | null>) {
   const [progress, setProgress] = useState(0)
   useEffect(() => {
@@ -255,20 +266,22 @@ function Navbar() {
         </span>
       </div>
 
-      <div className="hidden sm:flex items-center gap-6">
-        {[
-          { label: 'How it Works', id: 'how-it-works' },
-          { label: 'Use Cases',    id: 'use-cases' },
-        ].map(({ label, id }) => (
-          <button
-            key={id}
-            onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
-            className="text-sm font-medium transition-colors duration-200"
-            style={{ color: scrolled ? '#475569' : '#475569', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="flex items-center gap-3 sm:gap-6">
+        <div className="hidden sm:flex items-center gap-6">
+          {[
+            { label: 'How it Works', id: 'how-it-works' },
+            { label: 'Use Cases',    id: 'use-cases' },
+          ].map(({ label, id }) => (
+            <button
+              key={id}
+              onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-sm font-medium transition-colors duration-200"
+              style={{ color: '#475569', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={() => document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })}
           className="text-sm font-bold px-4 py-2 rounded-full transition-all duration-200"
@@ -352,8 +365,8 @@ function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 pt-24 pb-16">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-6 items-center min-h-[80vh]">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 pt-20 sm:pt-24 pb-10 sm:pb-16">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-6 items-center min-h-[80vh]">
 
           {/* Left */}
           <div className="flex flex-col">
@@ -467,7 +480,7 @@ function Hero() {
                   pointerEvents: 'none',
                 }}
               />
-              <PhoneMockup />
+              <PhoneMockup className="phone-mockup" />
             </div>
           </div>
         </div>
@@ -504,6 +517,12 @@ function Hero() {
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+        @media (max-width: 639px) {
+          .phone-mockup { transform: scale(0.82); transform-origin: center top; margin-bottom: -80px; }
+          .hero-badge { margin-bottom: 20px !important; }
+          .stat-grid { grid-template-columns: 1fr !important; }
+          .step-gap { gap: 40px !important; }
         }
       `}</style>
     </section>
@@ -610,7 +629,7 @@ const steps = [
   {
     n: '01', title: 'Customer calls. No answer.',
     body: "You're on a job, driving, or just unavailable. The call goes unanswered.",
-    icon: <img src="/logos/Missedcall.png" alt="Missed call" width={160} height={160} style={{ objectFit: 'contain' }} />,
+    icon: <img src="/logos/Missedcall-removebg-preview.png" alt="Missed call" width={160} height={160} style={{ objectFit: 'contain' }} />,
   },
   {
     n: '02', title: 'AutoReplyr fires in seconds.',
@@ -620,7 +639,7 @@ const steps = [
   {
     n: '03', title: 'Lead Captured.',
     body: "AutoReplyr asks smart follow-up questions, scores the lead's intent, and alerts you.",
-    icon: <img src="/logos/Alert.png" alt="Alert" width={160} height={160} style={{ objectFit: 'contain' }} />,
+    icon: <img src="/logos/Alert-removebg-preview.png" alt="Alert" width={160} height={160} style={{ objectFit: 'contain' }} />,
   },
 ]
 
@@ -685,7 +704,7 @@ function IntegrationsStrip() {
 function HowItWorks() {
   const { ref, inView } = useInView(0.1)
   return (
-    <section id="how-it-works" className="py-20 px-8" style={{ background: '#f4f6f9' }}>
+    <section id="how-it-works" className="py-12 sm:py-20 px-5 sm:px-8" style={{ background: '#f4f6f9' }}>
       <div className="max-w-6xl mx-auto">
         <div ref={ref} className="mb-12">
           <p
@@ -708,7 +727,7 @@ function HowItWorks() {
           </h2>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-12">
+        <div className="step-gap flex flex-col sm:flex-row justify-between items-center gap-12">
           {steps.map((s, i) => <StepCard key={i} step={s} delay={i * 130} />)}
         </div>
       </div>
@@ -747,9 +766,9 @@ const stats = [
 function Stats() {
   const { ref, inView } = useInView(0.2)
   return (
-    <section className="py-16 px-8" style={{ background: '#f8fafc', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3' }}>
+    <section className="py-10 sm:py-16 px-5 sm:px-8" style={{ background: '#f8fafc', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3' }}>
       <div className="max-w-6xl mx-auto" ref={ref}>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="stat-grid grid md:grid-cols-3 gap-6">
           {stats.map((s, i) => <StatCard key={i} stat={s} delay={i * 110} active={inView} />)}
         </div>
       </div>
@@ -806,9 +825,10 @@ function UseCases() {
   const { ref, inView } = useInView(0.1)
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const anyOpen = openIndex !== null
+  const isMobile = useIsMobile()
 
   return (
-    <section id="use-cases" className="py-20 px-8" style={{ background: '#ffffff' }}>
+    <section id="use-cases" className="py-12 sm:py-20 px-5 sm:px-8" style={{ background: '#ffffff' }}>
       <div className="max-w-5xl mx-auto">
         <div ref={ref} className="mb-10">
           <p className="text-xs font-bold tracking-widest uppercase mb-4"
@@ -819,7 +839,7 @@ function UseCases() {
           <h2
             className="font-bold tracking-tight max-w-xl"
             style={{
-              fontSize: 'clamp(32px, 4.5vw, 56px)',
+              fontSize: 'clamp(28px, 4.5vw, 56px)',
               color: '#1B2A4A', lineHeight: 1.15, letterSpacing: -1.5,
               opacity: inView ? 1 : 0,
               transform: inView ? 'translateY(0)' : 'translateY(20px)',
@@ -830,18 +850,56 @@ function UseCases() {
           </h2>
         </div>
 
-        <div style={{ display: 'flex', gap: 12, height: 380 }}>
-          {useCases.map((uc, i) => (
-            <UseCaseCard
-              key={i}
-              useCase={uc}
-              index={i}
-              isOpen={openIndex === i}
-              anyOpen={anyOpen}
-              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-            />
-          ))}
-        </div>
+        {isMobile ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {useCases.map((uc, i) => (
+              <div
+                key={i}
+                style={{
+                  border: openIndex === i ? '1.5px solid #E0001B' : '1.5px solid #e8edf3',
+                  borderRadius: 16, overflow: 'hidden',
+                  background: openIndex === i ? 'rgba(224,0,27,0.02)' : '#ffffff',
+                  transition: 'border-color 0.2s ease',
+                }}
+              >
+                <button
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                  style={{ width: '100%', padding: '20px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12 }}
+                >
+                  <div>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'rgba(224,0,27,0.4)' }}>0{i + 1}</span>
+                    <h3 style={{ fontSize: 17, fontWeight: 700, color: '#1B2A4A', letterSpacing: -0.4, marginTop: 4 }}>{uc.title}</h3>
+                  </div>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: openIndex === i ? '#E0001B' : '#f4f6f9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transform: openIndex === i ? 'rotate(45deg)' : 'none', transition: 'all 0.2s ease' }}>
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                      <line x1="6" y1="1" x2="6" y2="11" stroke={openIndex === i ? 'white' : '#1B2A4A'} strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="1" y1="6" x2="11" y2="6" stroke={openIndex === i ? 'white' : '#1B2A4A'} strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                </button>
+                <div style={{ maxHeight: openIndex === i ? 500 : 0, overflow: 'hidden', transition: 'max-height 0.4s cubic-bezier(0.22,1,0.36,1)' }}>
+                  <div style={{ padding: '0 20px 20px' }}>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: '#334155', lineHeight: 1.65, marginBottom: 10 }}>{uc.preview}</p>
+                    <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.75 }}>{uc.body}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 12, height: 380 }}>
+            {useCases.map((uc, i) => (
+              <UseCaseCard
+                key={i}
+                useCase={uc}
+                index={i}
+                isOpen={openIndex === i}
+                anyOpen={anyOpen}
+                onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )
@@ -971,7 +1029,7 @@ function WaitlistCTA() {
   return (
     <section
       id="waitlist"
-      className="py-24 px-8 relative overflow-hidden"
+      className="py-16 sm:py-24 px-5 sm:px-8 relative overflow-hidden"
       style={{ background: '#E0001B' }}
     >
       <div className="max-w-3xl mx-auto text-center relative z-10" ref={ref}>
