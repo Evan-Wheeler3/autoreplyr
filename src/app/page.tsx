@@ -976,13 +976,13 @@ function WaitlistCTA() {
     <section
       id="waitlist"
       className="py-24 px-8 relative overflow-hidden"
-      style={{ background: '#1B2A4A' }}
+      style={{ background: '#E0001B' }}
     >
       <div className="max-w-3xl mx-auto text-center relative z-10" ref={ref}>
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-6"
           style={{
-            color: '#E0001B', background: 'rgba(224,0,27,0.12)', border: '1px solid rgba(224,0,27,0.2)',
+            color: '#ffffff', background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)',
             opacity: inView ? 1 : 0, transition: 'opacity 0.6s ease',
           }}
         >
@@ -1005,7 +1005,7 @@ function WaitlistCTA() {
         <p
           className="text-lg mb-10 leading-relaxed max-w-xl mx-auto"
           style={{
-            color: 'rgba(255,255,255,0.55)',
+            color: 'rgba(255,255,255,0.8)',
             opacity: inView ? 1 : 0,
             transition: 'opacity 0.7s ease 0.2s',
           }}
@@ -1018,10 +1018,10 @@ function WaitlistCTA() {
           style={{ opacity: inView ? 1 : 0, transition: 'opacity 0.7s ease 0.25s' }}
         >
           {['Setup in minutes', 'No app needed', 'Cancel anytime'].map(item => (
-            <div key={item} className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <div key={item} className="flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="7" fill="rgba(224,0,27,0.25)" />
-                <path d="M4 7l2 2 4-4" stroke="#E0001B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="7" cy="7" r="7" fill="rgba(255,255,255,0.25)" />
+                <path d="M4 7l2 2 4-4" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               {item}
             </div>
@@ -1032,7 +1032,7 @@ function WaitlistCTA() {
           {submitted ? (
             <div
               className="inline-flex items-center gap-3 px-7 py-4 rounded-2xl font-medium"
-              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff' }}
+              style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.35)', color: '#ffffff' }}
             >
               🎉 You&apos;re on the list — talk soon.
             </div>
@@ -1045,13 +1045,13 @@ function WaitlistCTA() {
                 placeholder="your@email.com"
                 required
                 className="flex-1 px-5 py-4 rounded-2xl text-sm outline-none"
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: '#ffffff', fontSize: 15 }}
+                style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.35)', color: '#ffffff', fontSize: 15 }}
               />
               <button
                 type="submit"
                 disabled={loading}
                 className="px-7 py-4 rounded-2xl font-semibold text-white whitespace-nowrap hover:opacity-90 active:scale-95 transition-all duration-150"
-                style={{ background: '#E0001B', boxShadow: '0 4px 20px rgba(224,0,27,0.35)', fontSize: 15 }}
+                style={{ background: '#ffffff', color: '#E0001B', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', fontSize: 15 }}
               >
                 {loading ? 'Joining...' : 'Get Early Access'}
               </button>
