@@ -667,7 +667,7 @@ const steps = [
     icon: <img src="/logos/Instantsend.png" alt="Instant send" width={160} height={160} style={{ objectFit: 'contain' }} />,
   },
   {
-    n: '03', title: 'Lead captured. You get notified.',
+    n: '03', title: 'Lead Captured.',
     body: "AutoReplyr asks smart follow-up questions, scores the lead's intent, and alerts you.",
     icon: <img src="/logos/Alert.png" alt="Alert" width={160} height={160} style={{ objectFit: 'contain' }} />,
   },
