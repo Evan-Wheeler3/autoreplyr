@@ -717,14 +717,14 @@ const steps = [
 
 const integrations = [
   { name: 'Quo',          src: '/logos/quo-logo.png' },
-  { name: 'Twilio',       src: '/logos/twilio-logo.jpg' },
+  { name: 'Twilio',       src: '/logos/twilio-logo.png' },
   { name: 'RingCentral',  src: '/logos/ringcentral-logo.png' },
   { name: 'Google Voice', src: '/logos/googlevoice-logo.png' },
   { name: 'Dialpad',      src: '/logos/dialpad-logo.png' },
-  { name: 'Grasshopper',  src: '/logos/grasshopper-logo.webp' },
+  { name: 'Grasshopper',  src: '/logos/grasshopper-logo.png' },
   { name: 'Vonage',       src: '/logos/vonage-logo.png' },
   { name: 'Nextiva',      src: '/logos/nextiva-logo.png' },
-  { name: 'Ooma',         src: '/logos/ooma-logo.avif' },
+  { name: 'Ooma',         src: '/logos/ooma-logo.png' },
 ]
 
 function IntegrationsStrip() {
