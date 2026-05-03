@@ -734,9 +734,9 @@ function IntegrationsStrip() {
 function HowItWorks() {
   const { ref, inView } = useInView(0.1)
   return (
-    <section className="py-32 px-8" style={{ background: '#f4f6f9' }}>
+    <section className="py-20 px-8" style={{ background: '#f4f6f9' }}>
       <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-20">
+        <div ref={ref} className="mb-12">
           <p
             className="text-xs font-bold tracking-widest uppercase mb-4"
             style={{ color: '#E0001B', opacity: inView ? 1 : 0, transition: 'opacity 0.5s ease' }}
@@ -796,7 +796,7 @@ const stats = [
 function Stats() {
   const { ref, inView } = useInView(0.2)
   return (
-    <section className="py-28 px-8" style={{ background: '#f8fafc', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3' }}>
+    <section className="py-16 px-8" style={{ background: '#f8fafc', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3' }}>
       <div className="max-w-6xl mx-auto" ref={ref}>
         <div className="grid md:grid-cols-3 gap-6">
           {stats.map((s, i) => <StatCard key={i} stat={s} delay={i * 110} active={inView} />)}
@@ -875,9 +875,9 @@ function UseCases() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="py-32 px-8" style={{ background: '#ffffff' }}>
+    <section className="py-20 px-8" style={{ background: '#ffffff' }}>
       <div className="max-w-5xl mx-auto">
-        <div ref={ref} className="mb-16">
+        <div ref={ref} className="mb-10">
           <p className="text-xs font-bold tracking-widest uppercase mb-4"
             style={{ color: '#E0001B', opacity: inView ? 1 : 0, transition: 'opacity 0.5s ease' }}
           >
@@ -1012,7 +1012,7 @@ function WaitlistCTA() {
   return (
     <section
       id="waitlist"
-      className="py-36 px-8 relative overflow-hidden"
+      className="py-24 px-8 relative overflow-hidden"
       style={{ background: '#1B2A4A' }}
     >
       <div className="max-w-3xl mx-auto text-center relative z-10" ref={ref}>
