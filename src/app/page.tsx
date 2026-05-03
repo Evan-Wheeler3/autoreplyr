@@ -699,7 +699,7 @@ const steps = [
   },
   {
     n: '03', title: 'Lead captured. You get notified.',
-    body: "AutoReplyr asks smart follow-up questions, scores the lead's intent, and sends you an instant alert when someone is ready to book.",
+    body: "AutoReplyr asks smart follow-up questions, scores the lead's intent, and alerts you.",
     icon: (
       /* Dollar sign */
       <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
