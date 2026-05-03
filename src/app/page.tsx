@@ -789,7 +789,7 @@ const useCases = [
   {
     title: 'Field Service',
     preview: 'You\'re on a job site. A new customer calls. AutoReplyr texts them back instantly so you don\'t lose the lead.',
-    body: 'When you\'re on a job, every unanswered call is a potential customer lost. AutoReplyr texts back the moment a call is missed, asks what they need, and qualifies their urgency before you\'ve even put down your tools. High-intent leads get flagged immediately so you know who to call back first. You stay focused on the work. AutoReplyr handles the pipeline.',
+    body: 'When you\'re on a job, every unanswered call is a potential customer lost. AutoReplyr texts back the moment a call is missed, asks what they need, and qualifies their urgency to save your leads while you are busy. High-intent leads get flagged immediately so you know who to call back first. You stay focused on the work. AutoReplyr handles the pipeline.',
   },
   {
     title: 'Customer Support',
@@ -805,7 +805,7 @@ const useCases = [
 
 function UseCases() {
   const { ref, inView } = useInView(0.1)
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
     <section id="use-cases" className="py-20 px-8" style={{ background: '#ffffff' }}>
@@ -830,7 +830,7 @@ function UseCases() {
           </h2>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div style={{ display: 'flex', gap: 16, alignItems: 'stretch', minHeight: 300 }}>
           {useCases.map((uc, i) => (
             <UseCaseCard
               key={i}
@@ -838,7 +838,6 @@ function UseCases() {
               index={i}
               isOpen={openIndex === i}
               onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-              delay={i * 100}
             />
           ))}
         </div>
@@ -848,69 +847,78 @@ function UseCases() {
 }
 
 function UseCaseCard({
-  useCase, index, isOpen, onToggle, delay,
+  useCase, index, isOpen, onToggle,
 }: {
   useCase: typeof useCases[number]
   index: number
   isOpen: boolean
   onToggle: () => void
-  delay: number
 }) {
-  const { ref, inView } = useInView(0.05)
   return (
     <div
-      ref={ref}
+      onClick={onToggle}
       style={{
+        flex: isOpen ? 4 : 1,
+        minWidth: 0,
         border: isOpen ? '1.5px solid #E0001B' : '1.5px solid #e8edf3',
         borderRadius: 20,
+        background: isOpen ? 'rgba(224,0,27,0.02)' : '#ffffff',
+        cursor: 'pointer',
+        padding: 32,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        transition: 'flex 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.25s ease, background 0.25s ease',
         overflow: 'hidden',
-        opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(20px)',
-        transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms, border-color 0.2s ease`,
       }}
     >
-      {/* Header — always visible */}
-      <button
-        onClick={onToggle}
-        className="w-full text-left flex items-center justify-between gap-6 p-8"
-        style={{ background: isOpen ? 'rgba(224,0,27,0.03)' : '#ffffff', cursor: 'pointer' }}
-      >
-        <div className="flex items-center gap-5">
-          <span className="text-xs font-bold tracking-widest shrink-0" style={{ color: 'rgba(224,0,27,0.4)' }}>
-            0{index + 1}
-          </span>
-          <div>
-            <h3 className="text-xl font-bold tracking-tight" style={{ color: '#1B2A4A', letterSpacing: -0.5 }}>
-              {useCase.title}
-            </h3>
-            <p className="text-sm mt-1" style={{ color: '#64748b' }}>{useCase.preview}</p>
+      <div>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: 'rgba(224,0,27,0.4)' }}>
+          0{index + 1}
+        </span>
+        <h3
+          style={{
+            fontSize: isOpen ? 22 : 17,
+            fontWeight: 700,
+            color: '#1B2A4A',
+            letterSpacing: -0.5,
+            marginTop: 10,
+            whiteSpace: isOpen ? 'normal' : 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            transition: 'font-size 0.3s ease',
+          }}
+        >
+          {useCase.title}
+        </h3>
+
+        {isOpen && (
+          <div style={{ marginTop: 16 }}>
+            <p style={{ fontSize: 14, fontWeight: 500, color: '#475569', marginBottom: 12, lineHeight: 1.6 }}>
+              {useCase.preview}
+            </p>
+            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.75 }}>
+              {useCase.body}
+            </p>
           </div>
-        </div>
+        )}
+      </div>
+
+      <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
         <div
           style={{
-            width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+            width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
             background: isOpen ? '#E0001B' : '#f4f6f9',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'background 0.2s ease, transform 0.2s ease',
             transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
           }}
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
             <line x1="6" y1="1" x2="6" y2="11" stroke={isOpen ? 'white' : '#1B2A4A'} strokeWidth="2" strokeLinecap="round"/>
             <line x1="1" y1="6" x2="11" y2="6" stroke={isOpen ? 'white' : '#1B2A4A'} strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </div>
-      </button>
-
-      {/* Expandable body */}
-      <div style={{
-        maxHeight: isOpen ? 300 : 0,
-        overflow: 'hidden',
-        transition: 'max-height 0.4s cubic-bezier(0.22,1,0.36,1)',
-      }}>
-        <p className="text-sm leading-relaxed px-8 pb-8" style={{ color: '#64748b', maxWidth: 680 }}>
-          {useCase.body}
-        </p>
       </div>
     </div>
   )
