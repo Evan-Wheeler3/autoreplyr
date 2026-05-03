@@ -321,10 +321,13 @@ function ScrollingPlane() {
       <div style={{
         transform: `scale(${hovered ? 1.15 : 1})`,
         transition: 'transform 0.15s ease',
-        filter: 'drop-shadow(0 2px 14px rgba(224,0,27,0.5)) drop-shadow(0 0 12px rgba(255,255,255,0.9)) drop-shadow(0 0 24px rgba(255,255,255,0.5))',
-        opacity: hovered ? 1 : 0.92,
+        width: 56, height: 56, borderRadius: '50%',
+        background: 'rgba(255,255,255,0.18)',
+        backdropFilter: 'blur(6px)',
+        boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <Image src="/plane.png" alt="Join Waitlist" width={48} height={48} className="object-contain" />
+        <Image src="/plane.png" alt="Join Waitlist" width={36} height={36} className="object-contain" />
       </div>
     </div>
   )
