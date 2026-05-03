@@ -658,6 +658,7 @@ function StickyStory() {
 const steps = [
   {
     n: '01', title: 'Customer calls. No answer.',
+    body: "You're on a job, driving, or just unavailable. The call goes unanswered — and without a fast response, that lead moves on to the next contractor on Google.",
     icon: (
       /* Missed call: coral circle, white phone + X */
       <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
@@ -670,6 +671,7 @@ const steps = [
   },
   {
     n: '02', title: 'AutoReplyr fires in seconds.',
+    body: 'The moment the call ends, AutoReplyr sends a personalized text from your number. Your caller hears from you before they\'ve even put their phone down.',
     icon: (
       /* Stopwatch: red outline with hand */
       <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
@@ -697,6 +699,7 @@ const steps = [
   },
   {
     n: '03', title: 'Lead captured. You get notified.',
+    body: 'AutoReplyr asks smart follow-up questions, scores the lead\'s intent, and sends you an instant alert when someone is ready to book. You call back with context — not cold.',
     icon: (
       /* Dollar sign */
       <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
@@ -812,7 +815,8 @@ function StepCard({ step, delay }: { step: typeof steps[number]; delay: number }
     >
       <div className="mb-6" style={{ width: 160, height: 160 }}>{step.icon}</div>
       <span className="text-sm font-bold tracking-widest mb-3 block" style={{ color: 'rgba(224,0,27,0.5)' }}>{step.n}</span>
-      <h3 className="text-2xl font-bold leading-snug" style={{ color: '#1B2A4A', letterSpacing: -0.5 }}>{step.title}</h3>
+      <h3 className="text-2xl font-bold leading-snug mb-3" style={{ color: '#1B2A4A', letterSpacing: -0.5 }}>{step.title}</h3>
+      <p className="text-sm leading-relaxed" style={{ color: '#64748b', maxWidth: 220 }}>{step.body}</p>
     </div>
   )
 }
