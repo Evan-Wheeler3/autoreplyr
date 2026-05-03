@@ -659,53 +659,17 @@ const steps = [
   {
     n: '01', title: 'Customer calls. No answer.',
     body: "You're on a job, driving, or just unavailable. The call goes unanswered.",
-    icon: (
-      /* Missed call: coral circle, white phone + X */
-      <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="50" r="50" fill="#E8606A" />
-        <path d="M55 57.5c-1.8-1.8-4.2-2.8-6.5-1.8l-2.8 1.2c-.9.4-2 .2-2.7-.5l-9.2-9.2c-.7-.7-.9-1.8-.5-2.7l1.2-2.8c1-2.3 0-4.7-1.8-6.5L30.2 32c-1.8-1.8-4.5-1.8-6.2 0l-1.5 1.5C19.5 36.5 19 41 21.2 45.5c2.8 5.5 7.2 11.5 13.3 17.5 6 6 12 10.5 17.5 13.3 4.5 2.2 9 1.7 12 -1.3l1.5-1.5c1.8-1.8 1.8-4.5 0-6.2L55 57.5z" fill="white" />
-        <line x1="68" y1="26" x2="80" y2="38" stroke="white" strokeWidth="6" strokeLinecap="round" />
-        <line x1="80" y1="26" x2="68" y2="38" stroke="white" strokeWidth="6" strokeLinecap="round" />
-      </svg>
-    ),
+    icon: <img src="/logos/Missedcall.png" alt="Missed call" width={160} height={160} style={{ objectFit: 'contain' }} />,
   },
   {
     n: '02', title: 'AutoReplyr fires in seconds.',
     body: 'The moment the call ends, AutoReplyr sends a personalized text from your number.',
-    icon: (
-      /* Stopwatch: red outline with hand */
-      <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
-        {/* Crown button */}
-        <rect x="44" y="6" width="12" height="8" rx="3" fill="#E0001B" />
-        {/* Lap button */}
-        <rect x="16" y="24" width="8" height="5" rx="2" fill="#E0001B" transform="rotate(-40 16 24)" />
-        {/* Main circle */}
-        <circle cx="50" cy="58" r="34" stroke="#E0001B" strokeWidth="5" />
-        {/* Hour dots */}
-        <circle cx="50" cy="27" r="3" fill="#E0001B" />
-        <circle cx="67" cy="31" r="3" fill="#E0001B" />
-        <circle cx="79" cy="44" r="3" fill="#E0001B" />
-        <circle cx="82" cy="62" r="3" fill="#E0001B" />
-        <circle cx="72" cy="78" r="3" fill="#E0001B" />
-        <circle cx="50" cy="88" r="3" fill="#E0001B" />
-        <circle cx="28" cy="78" r="3" fill="#E0001B" />
-        <circle cx="18" cy="62" r="3" fill="#E0001B" />
-        <circle cx="21" cy="44" r="3" fill="#E0001B" />
-        {/* Hand pointing to ~1 o'clock */}
-        <line x1="50" y1="58" x2="68" y2="36" stroke="#E0001B" strokeWidth="3.5" strokeLinecap="round" />
-        <circle cx="50" cy="58" r="4" fill="#E0001B" />
-      </svg>
-    ),
+    icon: <img src="/logos/Instantsend.png" alt="Instant send" width={160} height={160} style={{ objectFit: 'contain' }} />,
   },
   {
     n: '03', title: 'Lead captured. You get notified.',
     body: "AutoReplyr asks smart follow-up questions, scores the lead's intent, and alerts you.",
-    icon: (
-      /* Dollar sign */
-      <svg width="160" height="160" viewBox="0 0 100 100" fill="none">
-        <text x="50" y="88" textAnchor="middle" fontSize="100" fontWeight="900" fontFamily="Arial, sans-serif" fill="#E0001B">$</text>
-      </svg>
-    ),
+    icon: <img src="/logos/Alert.png" alt="Alert" width={160} height={160} style={{ objectFit: 'contain' }} />,
   },
 ]
 
