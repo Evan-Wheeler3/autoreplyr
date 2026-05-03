@@ -550,6 +550,10 @@ function Hero() {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
           30% { transform: translateY(-4px); opacity: 1; }
         }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
       `}</style>
     </section>
   )
@@ -720,21 +724,40 @@ const integrations = [
 ]
 
 function IntegrationsStrip() {
+  const items = [...integrations, ...integrations] // duplicate for seamless loop
   return (
-    <div style={{ background: '#f4f6f9', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3', padding: '24px 0' }}>
-      <div className="max-w-6xl mx-auto px-8">
-        <div className="flex items-center gap-10 flex-wrap justify-between">
-          <p className="text-xs font-bold tracking-widest uppercase shrink-0" style={{ color: '#94a3b8' }}>
-            Works with
-          </p>
-          <div className="flex items-center gap-8 flex-wrap">
-            {integrations.map((int) => (
-              <div key={int.name} className="flex items-center gap-2.5 opacity-50 hover:opacity-90 transition-opacity duration-200">
-                <Image src={int.src} alt={int.name} width={28} height={28} style={{ objectFit: 'contain', borderRadius: 6 }} />
-                <span className="text-sm font-semibold whitespace-nowrap" style={{ color: '#1B2A4A' }}>{int.name}</span>
-              </div>
-            ))}
-          </div>
+    <div style={{ background: '#f4f6f9', borderTop: '1px solid #e8edf3', borderBottom: '1px solid #e8edf3', padding: '28px 0' }}>
+      {/* Works with label */}
+      <p className="text-xs font-bold tracking-widest uppercase text-center mb-6" style={{ color: '#94a3b8' }}>
+        Works with
+      </p>
+
+      {/* Marquee container */}
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Fade masks */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          background: 'linear-gradient(to right, #f4f6f9 0%, transparent 12%, transparent 88%, #f4f6f9 100%)',
+        }} />
+
+        {/* Scrolling track */}
+        <div style={{
+          display: 'flex',
+          width: 'max-content',
+          animation: 'marquee 22s linear infinite',
+        }}>
+          {items.map((int, i) => (
+            <div key={i} className="flex items-center gap-3 mx-10">
+              <Image
+                src={int.src}
+                alt={int.name}
+                width={44}
+                height={44}
+                style={{ objectFit: 'contain', borderRadius: 8 }}
+              />
+              <span className="text-base font-semibold whitespace-nowrap" style={{ color: '#1B2A4A' }}>{int.name}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
