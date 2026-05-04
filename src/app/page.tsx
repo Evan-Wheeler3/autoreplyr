@@ -643,36 +643,25 @@ function HowItWorks() {
           >
             How It Works
           </p>
-          <div className="flex items-start gap-6">
-            <h2
-              className="font-bold tracking-tight flex-1"
-              style={{
-                fontSize: 'clamp(36px, 5vw, 64px)',
-                color: '#1B2A4A', lineHeight: 1.1, letterSpacing: -2,
-                opacity: inView ? 1 : 0,
-                transform: inView ? 'translateY(0)' : 'translateY(24px)',
-                transition: 'opacity 0.55s ease 0.08s, transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.08s',
-              }}
-            >
-              Three steps.<br />Zero effort.
-            </h2>
-            <Link
-              href="/demo"
-              className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95 shrink-0"
-              style={{ background: '#E0001B', color: '#fff', boxShadow: '0 4px 16px rgba(224,0,27,0.28)', textDecoration: 'none', marginRight: '18%', marginTop: '0.6rem' }}
-            >
-              See it in action
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </Link>
-          </div>
+          <h2
+            className="font-bold tracking-tight"
+            style={{
+              fontSize: 'clamp(36px, 5vw, 64px)',
+              color: '#1B2A4A', lineHeight: 1.1, letterSpacing: -2,
+              opacity: inView ? 1 : 0,
+              transform: inView ? 'translateY(0)' : 'translateY(24px)',
+              transition: 'opacity 0.55s ease 0.08s, transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.08s',
+            }}
+          >
+            Three steps.<br />Zero effort.
+          </h2>
         </div>
 
         <div className="step-gap flex flex-col sm:flex-row justify-between items-center gap-12">
           {steps.map((s, i) => <StepCard key={i} step={s} delay={i * 130} />)}
         </div>
 
-        {/* Mobile-only button below steps */}
-        <div className="mt-10 flex justify-center sm:hidden">
+        <div className="mt-12 flex justify-center">
           <Link
             href="/demo"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95"
