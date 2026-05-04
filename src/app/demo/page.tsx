@@ -443,8 +443,8 @@ export default function DemoPage() {
           width: 390, height: PHONE_H,
           transform: `scale(${phoneScale})`, transformOrigin: 'top left',
           borderRadius: 50, background: '#fff',
-          border: '1px solid rgba(0,0,0,0.12)',
-          boxShadow: '0 40px 80px rgba(0,0,0,0.25), 0 0 0 6px rgba(255,255,255,0.15)',
+          border: '2.5px solid #1B2A4A',
+          boxShadow: '0 40px 80px rgba(0,0,0,0.25)',
           overflow: 'hidden',
         }}>
           {/* Dynamic island */}

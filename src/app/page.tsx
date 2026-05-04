@@ -228,7 +228,7 @@ function PhoneWithDemoLink() {
       {/* Hover ring */}
       <div style={{
         position: 'absolute', inset: -4, borderRadius: 48, pointerEvents: 'none', zIndex: 10,
-        boxShadow: hovered ? '0 0 0 3px rgba(27,42,74,0.35)' : '0 0 0 1.5px rgba(27,42,74,0.1)',
+        boxShadow: hovered ? '0 0 0 4px #1B2A4A' : '0 0 0 2px rgba(27,42,74,0.55)',
         transition: 'box-shadow 0.25s ease',
       }} />
       <PhoneMockup className="phone-mockup" />
@@ -381,7 +381,7 @@ function Hero() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     required
-                    className="flex-1 px-5 py-3.5 rounded-2xl text-sm outline-none"
+                    className="flex-1 px-5 py-3.5 rounded-2xl text-sm outline-none input-dark-placeholder"
                     style={{ background: '#f4f6f9', border: '1.5px solid #e2e8f0', color: '#0f1923', fontSize: 15 }}
                   />
                   <button
@@ -1039,7 +1039,7 @@ function WaitlistCTA() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="flex-1 px-5 py-4 rounded-2xl text-sm outline-none"
+                className="flex-1 px-5 py-4 rounded-2xl text-sm outline-none input-dark-placeholder"
                 style={{ background: '#ffffff', border: 'none', color: '#0f1923', fontSize: 15 }}
               />
               <button
