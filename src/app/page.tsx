@@ -78,76 +78,31 @@ function useSectionProgress(ref: RefObject<HTMLDivElement | null>) {
 
 /* ─── Phone Mockup ──────────────────────────────────────────────────────────── */
 
-const PREVIEW = [
-  { from: 'them' as const, text: 'Hi, sorry we missed your call at Riverside HVAC. Reply YES for a quick response. Reply STOP to opt out.', delay: 300 },
-  { from: 'me'   as const, text: 'YES', delay: 1100 },
-  { from: 'them' as const, text: 'What type of service do you need?', delay: 1800 },
-]
-
-interface ChatMsg { from: 'them' | 'me'; text: string }
-interface Option { label: string; response: string; next?: Option[] }
-
-const FLOW: Option[] = [
-  {
-    label: 'Repair / Emergency',
-    response: "Got it, we are treating this as urgent. A technician will be reaching out to you within the next 30 minutes. Can you share your address so we can get someone headed your way?",
-  },
-  {
-    label: 'Get a quote',
-    response: "No problem at all. You can get an instant quote right here: riverside-hvac.com/quote. Someone will also follow up to answer any questions.",
-  },
-  {
-    label: 'Schedule a visit',
-    response: "Sounds great. You can pick a time that works for you right here: calendly.com/riverside-hvac. We look forward to seeing you.",
-  },
+const PREVIEW_MSGS = [
+  { from: 'them' as const, text: 'Hi, sorry we missed your call at Riverside HVAC. Reply YES for a quick response.' },
+  { from: 'me'   as const, text: 'YES' },
+  { from: 'them' as const, text: 'What type of service do you need?' },
+  { from: 'me'   as const, text: 'My AC stopped working' },
+  { from: 'them' as const, text: 'Got it. A technician will reach out within 30 minutes. Your appointment is confirmed.' },
 ]
 
 function PhoneMockup({ className = '' }: { className?: string }) {
-  const [visibleCount, setVisibleCount] = useState(0)
-  const [messages, setMessages] = useState<ChatMsg[]>([])
-  const [options, setOptions] = useState<Option[] | null>(null)
-  const [typing, setTyping] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const timers = PREVIEW.map((msg, i) =>
-      setTimeout(() => setVisibleCount(v => Math.max(v, i + 1)), msg.delay)
-    )
-    const showOptions = setTimeout(() => setOptions(FLOW), PREVIEW[PREVIEW.length - 1].delay + 800)
-    return () => { timers.forEach(clearTimeout); clearTimeout(showOptions) }
-  }, [])
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (el) el.scrollTop = el.scrollHeight
-  }, [visibleCount, messages, typing])
-
-  function pick(opt: Option) {
-    setOptions(null)
-    setMessages(prev => [...prev, { from: 'me', text: opt.label }])
-    setTyping(true)
-    setTimeout(() => {
-      setTyping(false)
-      setMessages(prev => [...prev, { from: 'them', text: opt.response }])
-      if (opt.next) setTimeout(() => setOptions(opt.next!), 400)
-    }, 900 + Math.random() * 500)
-  }
-
-  const bubble = (from: 'them' | 'me') => ({
-    maxWidth: '78%', padding: '8px 12px',
+  const bubble = (from: 'them' | 'me'): React.CSSProperties => ({
+    maxWidth: '78%', padding: '9px 13px',
     borderRadius: from === 'me' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
     background: from === 'me' ? '#1B2A4A' : '#f2f2f7',
     color: from === 'me' ? '#fff' : '#000',
-    fontSize: 13, lineHeight: 1.4, letterSpacing: -0.1,
+    fontSize: 13, lineHeight: 1.45, letterSpacing: -0.1,
   })
 
   return (
     <div
       className={className}
       style={{
-        width: 300, height: 580, borderRadius: 44, background: '#fff',
+        width: 300, height: 540, borderRadius: 44, background: '#fff',
         boxShadow: '0 50px 100px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.8)',
         overflow: 'hidden', display: 'flex', flexDirection: 'column', flexShrink: 0,
+        pointerEvents: 'none', userSelect: 'none',
       }}
     >
       {/* Status bar */}
@@ -166,70 +121,29 @@ function PhoneMockup({ className = '' }: { className?: string }) {
       {/* Header */}
       <div style={{ background: '#f2f2f7', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '8px 16px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #1B2A4A, #2d4a7a)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <span style={{ color: 'white', fontSize: 16, fontWeight: 700 }}>A</span>
+          <span style={{ color: 'white', fontSize: 16, fontWeight: 700 }}>R</span>
         </div>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#000', letterSpacing: -0.2 }}>AutoReplyr</div>
-          <div style={{ fontSize: 11, color: '#888' }}>{typing ? 'Typing…' : 'Text Message'}</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#000', letterSpacing: -0.2 }}>Riverside HVAC</div>
+          <div style={{ fontSize: 11, color: '#888' }}>Text Message</div>
         </div>
       </div>
 
-      {/* Messages — scroll contained, no page interference */}
-      <div
-        ref={scrollRef}
-        onWheel={e => e.stopPropagation()}
-        style={{ flex: 1, background: '#fff', padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto' }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 6 }}>
+      {/* Static messages */}
+      <div style={{ flex: 1, background: '#fff', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 6, overflow: 'hidden' }}>
+        <div style={{ textAlign: 'center', marginBottom: 4 }}>
           <span style={{ fontSize: 11, color: '#999', background: '#f2f2f7', padding: '3px 10px', borderRadius: 10 }}>
             📞 Missed Call · just now
           </span>
         </div>
-
-        {PREVIEW.slice(0, visibleCount).map((msg, i) => (
+        {PREVIEW_MSGS.map((msg, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: msg.from === 'me' ? 'flex-end' : 'flex-start' }}>
             <div style={bubble(msg.from)}>{msg.text}</div>
           </div>
         ))}
-
-        {messages.map((msg, i) => (
-          <div key={`m${i}`} style={{ display: 'flex', justifyContent: msg.from === 'me' ? 'flex-end' : 'flex-start' }}>
-            <div style={bubble(msg.from)}>{msg.text}</div>
-          </div>
-        ))}
-
-        {typing && (
-          <div style={{ display: 'flex' }}>
-            <div style={{ ...bubble('them'), display: 'flex', gap: 4, alignItems: 'center', padding: '10px 14px' }}>
-              {[0, 1, 2].map(i => (
-                <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#999', animation: `typingDot 1.2s ${i * 0.2}s infinite` }} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {options && !typing && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, marginTop: 4 }}>
-            {options.map((opt, i) => (
-              <button
-                key={i}
-                onClick={(e) => { e.stopPropagation(); pick(opt) }}
-                style={{
-                  background: '#fff', border: '1.5px solid rgba(27,42,74,0.25)', borderRadius: 18,
-                  padding: '7px 14px', fontSize: 13, fontWeight: 500, color: '#1B2A4A',
-                  cursor: 'pointer', transition: 'background 0.15s, border-color 0.15s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(27,42,74,0.06)'; e.currentTarget.style.borderColor = 'rgba(27,42,74,0.5)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'rgba(27,42,74,0.25)' }}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Input bar — always static */}
+      {/* Input bar */}
       <div style={{ background: '#f2f2f7', padding: '8px 12px 16px', display: 'flex', gap: 8, alignItems: 'center' }}>
         <div style={{ flex: 1, background: '#fff', borderRadius: 20, padding: '8px 14px', fontSize: 13, color: '#aaa', border: '1px solid rgba(0,0,0,0.1)' }}>
           iMessage
