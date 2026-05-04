@@ -281,6 +281,9 @@ function Navbar() {
               {label}
             </button>
           ))}
+          <Link href="/demo" className="text-sm font-medium transition-colors duration-200" style={{ color: '#475569', textDecoration: 'none' }}>
+            Demo
+          </Link>
         </div>
         <button
           onClick={() => document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })}
