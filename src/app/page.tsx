@@ -643,9 +643,9 @@ function HowItWorks() {
           >
             How It Works
           </p>
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
             <h2
-              className="font-bold tracking-tight"
+              className="font-bold tracking-tight flex-1"
               style={{
                 fontSize: 'clamp(36px, 5vw, 64px)',
                 color: '#1B2A4A', lineHeight: 1.1, letterSpacing: -2,
@@ -656,14 +656,17 @@ function HowItWorks() {
             >
               Three steps.<br />Zero effort.
             </h2>
-            <Link
-              href="/demo"
-              className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95 shrink-0"
-              style={{ background: '#E0001B', color: '#fff', boxShadow: '0 4px 16px rgba(224,0,27,0.28)', textDecoration: 'none' }}
-            >
-              See it in action
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </Link>
+            {/* Width matches the Lead Captured step card so button right-edge aligns with its body text */}
+            <div className="hidden sm:flex items-center justify-center shrink-0" style={{ width: 'calc(33.33% - 1rem)' }}>
+              <Link
+                href="/demo"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95"
+                style={{ background: '#E0001B', color: '#fff', boxShadow: '0 4px 16px rgba(224,0,27,0.28)', textDecoration: 'none' }}
+              >
+                See it in action
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </Link>
+            </div>
           </div>
         </div>
 
