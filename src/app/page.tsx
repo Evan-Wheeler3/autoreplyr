@@ -213,7 +213,7 @@ function PhoneMockup({ className = '' }: { className?: string }) {
             {options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => pick(opt)}
+                onClick={(e) => { e.stopPropagation(); pick(opt) }}
                 style={{
                   background: '#fff', border: '1.5px solid rgba(27,42,74,0.25)', borderRadius: 18,
                   padding: '7px 14px', fontSize: 13, fontWeight: 500, color: '#1B2A4A',
@@ -297,6 +297,30 @@ function Navbar() {
   )
 }
 
+
+/* ─── Phone + Demo Link ──────────────────────────────────────────────────────── */
+
+function PhoneWithDemoLink() {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <div
+      style={{ position: 'relative', cursor: 'pointer' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => { window.location.href = '/demo' }}
+    >
+      {/* Glow */}
+      <div style={{ position: 'absolute', inset: -40, background: 'radial-gradient(ellipse, rgba(27,42,74,0.08) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+      {/* Hover ring */}
+      <div style={{
+        position: 'absolute', inset: -4, borderRadius: 48, pointerEvents: 'none', zIndex: 10,
+        boxShadow: hovered ? '0 0 0 3px rgba(27,42,74,0.35)' : '0 0 0 1.5px rgba(27,42,74,0.1)',
+        transition: 'box-shadow 0.25s ease',
+      }} />
+      <PhoneMockup className="phone-mockup" />
+    </div>
+  )
+}
 
 /* ─── Hero ──────────────────────────────────────────────────────────────────── */
 
@@ -473,39 +497,7 @@ function Hero() {
                 : 'opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s',
             }}
           >
-            <div style={{ position: 'relative' }}>
-              {/* Glow behind phone */}
-              <div
-                style={{
-                  position: 'absolute', inset: -40,
-                  background: 'radial-gradient(ellipse, rgba(27,42,74,0.08) 0%, transparent 70%)',
-                  borderRadius: '50%',
-                  pointerEvents: 'none',
-                }}
-              />
-              <PhoneMockup className="phone-mockup" />
-              {/* Demo link badge */}
-              <Link
-                href="/demo"
-                className="absolute left-1/2 -translate-x-1/2"
-                style={{
-                  bottom: -18,
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: '#1B2A4A', color: '#fff',
-                  fontSize: 12, fontWeight: 600,
-                  padding: '7px 16px', borderRadius: 20,
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 14px rgba(27,42,74,0.25)',
-                  whiteSpace: 'nowrap',
-                  transition: 'background 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E0001B' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1B2A4A' }}
-              >
-                Try the live demo
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1.5 6h9M7 2.5l3.5 3.5L7 9.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </Link>
-            </div>
+            <PhoneWithDemoLink />
           </div>
         </div>
       </div>
@@ -1134,7 +1126,7 @@ function WaitlistCTA() {
                 placeholder="your@email.com"
                 required
                 className="flex-1 px-5 py-4 rounded-2xl text-sm outline-none"
-                style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.35)', color: '#ffffff', fontSize: 15 }}
+                style={{ background: '#ffffff', border: 'none', color: '#0f1923', fontSize: 15 }}
               />
               <button
                 type="submit"
