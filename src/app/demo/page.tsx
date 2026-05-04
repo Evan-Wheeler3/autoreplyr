@@ -1,14 +1,52 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 
-type Stage = 'intro' | 'calling' | 'noanswer' | 'recents' | 'messages' | 'complete'
+type Stage = 'intro' | 'calling' | 'noanswer' | 'recents' | 'messages'
 interface Msg { from: 'them' | 'me'; text: string }
+interface Option { label: string; text: string; end?: boolean }
+interface FlowStep { them: string; options: Option[] | null }
 
-/* ─── Data ───────────────────────────────────────────────────────────────────── */
+/* ─── Conversation flow ──────────────────────────────────────────────────────── */
+
+const FLOW: FlowStep[] = [
+  {
+    them: 'Hi, sorry we missed your call at Riverside HVAC. Reply YES for a quick response. Reply STOP to opt out.',
+    options: [
+      { label: 'YES',  text: 'YES' },
+      { label: 'STOP', text: 'STOP', end: true },
+    ],
+  },
+  {
+    them: 'What type of service do you need?',
+    options: [
+      { label: 'AC repair',    text: 'My AC stopped working' },
+      { label: 'Heating issue', text: 'My heater stopped working' },
+      { label: 'New system quote', text: 'I need a quote for a new system' },
+    ],
+  },
+  {
+    them: 'How urgent is this for you?',
+    options: [
+      { label: 'Emergency, need same day', text: 'Emergency' },
+      { label: 'This week works',          text: 'This week' },
+      { label: 'Just getting a quote',     text: 'Just a quote' },
+    ],
+  },
+  {
+    them: 'Got it. Can you share your address so we can send a technician your way?',
+    options: [
+      { label: '123 Oak Street', text: '123 Oak Street' },
+    ],
+  },
+  {
+    them: 'Perfect. A technician will be there within 30 minutes. Your appointment is confirmed.',
+    options: null,
+  },
+]
 
 const RECENTS = [
   { name: 'Riverside HVAC', time: 'just now', missed: true },
@@ -17,38 +55,21 @@ const RECENTS = [
   { name: 'Jake Wilson',    time: '3h ago',   missed: false },
 ]
 
-const SCRIPT: { from: 'them' | 'me'; text: string }[] = [
-  { from: 'them', text: 'Hi, sorry we missed your call at Riverside HVAC. Reply YES for a quick response. Reply STOP to opt out.' },
-  { from: 'me',   text: 'YES' },
-  { from: 'them', text: 'What type of service do you need?' },
-  { from: 'me',   text: 'My AC stopped working' },
-  { from: 'them', text: 'How urgent is this? Reply 1 for Emergency, 2 for This Week, or 3 for Just a Quote.' },
-  { from: 'me',   text: '1' },
-  { from: 'them', text: 'We are on it. Can you share your address so we can send a technician your way?' },
-  { from: 'me',   text: '123 Oak Street' },
-  { from: 'them', text: 'Perfect. A technician will be there within 30 minutes. Your appointment is confirmed.' },
-]
-
 /* ─── Cursor ─────────────────────────────────────────────────────────────────── */
 
 function Cursor({ x, y, clicking }: { x: number; y: number; clicking: boolean }) {
   return (
     <div style={{
       position: 'absolute', left: x, top: y,
-      transition: 'left 1.4s cubic-bezier(0.4,0,0.2,1), top 1.4s cubic-bezier(0.4,0,0.2,1)',
+      transition: 'left 1.5s cubic-bezier(0.4,0,0.2,1), top 1.5s cubic-bezier(0.4,0,0.2,1)',
       zIndex: 100, pointerEvents: 'none',
       transform: 'translate(-4px, -4px)',
     }}>
-      <svg width="22" height="26" viewBox="0 0 22 26" fill="none" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}>
-        <path d="M3 1.5L19 12.5L11.5 14L8 23.5L3 1.5Z" fill="white" stroke="rgba(0,0,0,0.35)" strokeWidth="1.5" strokeLinejoin="round"/>
+      <svg width="22" height="26" viewBox="0 0 22 26" fill="none" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}>
+        <path d="M3 1.5L19 12.5L11.5 14L8 23.5L3 1.5Z" fill="white" stroke="rgba(0,0,0,0.3)" strokeWidth="1.5" strokeLinejoin="round"/>
       </svg>
       {clicking && (
-        <div style={{
-          position: 'absolute', top: -10, left: -10,
-          width: 44, height: 44, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.35)',
-          animation: 'clickPulse 0.45s ease-out forwards',
-        }} />
+        <div style={{ position: 'absolute', top: -10, left: -10, width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.3)', animation: 'clickPulse 0.45s ease-out forwards' }} />
       )}
     </div>
   )
@@ -58,50 +79,22 @@ function Cursor({ x, y, clicking }: { x: number; y: number; clicking: boolean })
 
 function IntroScreen({ onStart }: { onStart: () => void }) {
   const [pulse, setPulse] = useState(false)
-  useEffect(() => {
-    const t = setInterval(() => setPulse(p => !p), 1400)
-    return () => clearInterval(t)
-  }, [])
-
+  useEffect(() => { const t = setInterval(() => setPulse(p => !p), 1400); return () => clearInterval(t) }, [])
   return (
-    <div style={{
-      height: '100%',
-      background: 'linear-gradient(160deg, #1B2A4A 0%, #0f1923 100%)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '0 40px', gap: 32,
-    }}>
+    <div style={{ height: '100%', background: 'linear-gradient(160deg, #1B2A4A 0%, #0f1923 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 36px', gap: 28 }}>
       <div style={{ textAlign: 'center' }}>
-        <p style={{ color: '#E0001B', fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 20 }}>
-          AutoReplyr Demo
-        </p>
-        <h2 style={{ color: '#fff', fontSize: 26, fontWeight: 700, lineHeight: 1.25, letterSpacing: -0.5, marginBottom: 14 }}>
-          See what happens<br />after a missed call.
+        <p style={{ color: '#E0001B', fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18 }}>AutoReplyr Demo</p>
+        <h2 style={{ color: '#fff', fontSize: 24, fontWeight: 700, lineHeight: 1.3, letterSpacing: -0.5, marginBottom: 12 }}>
+          See what happens after<br />a missed call.
         </h2>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 1.65 }}>
-          Call a local HVAC company. They are busy on a job. Watch what happens next.
+        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, lineHeight: 1.65 }}>
+          Call a local HVAC company. They are busy on a job. Watch AutoReplyr take over — then take part in the conversation.
         </p>
       </div>
-
-      <button
-        onClick={onStart}
-        style={{
-          width: 76, height: 76, borderRadius: '50%',
-          background: '#4CD964',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: pulse
-            ? '0 0 0 16px rgba(76,217,100,0.12), 0 0 0 32px rgba(76,217,100,0.06)'
-            : '0 0 0 8px rgba(76,217,100,0.15)',
-          transition: 'box-shadow 0.7s ease, transform 0.15s',
-          fontSize: 30,
-        }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
-      >
+      <button onClick={onStart} style={{ width: 72, height: 72, borderRadius: '50%', background: '#4CD964', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, boxShadow: pulse ? '0 0 0 16px rgba(76,217,100,0.12), 0 0 0 32px rgba(76,217,100,0.05)' : '0 0 0 8px rgba(76,217,100,0.12)', transition: 'box-shadow 0.7s ease, transform 0.15s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)' }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}>
         📞
       </button>
-
-      <p style={{ color: 'rgba(255,255,255,0.28)', fontSize: 13 }}>Tap to start</p>
+      <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: 12 }}>Tap to call</p>
     </div>
   )
 }
@@ -110,72 +103,32 @@ function IntroScreen({ onStart }: { onStart: () => void }) {
 
 function CallScreen({ rings, noAnswer }: { rings: number; noAnswer: boolean }) {
   return (
-    <div style={{
-      height: '100%',
-      background: 'linear-gradient(170deg, #1a1a2e 0%, #0f3460 100%)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center',
-      paddingTop: 90, position: 'relative',
-    }}>
-      {/* Ripple rings */}
+    <div style={{ height: '100%', background: 'linear-gradient(170deg, #1a1a2e 0%, #0f3460 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 80, position: 'relative' }}>
       {rings > 0 && !noAnswer && [0, 1].map(i => (
-        <div key={i} style={{
-          position: 'absolute',
-          top: 90 + 50 - (i * 20),
-          left: '50%', transform: 'translateX(-50%)',
-          width: 100 + i * 40, height: 100 + i * 40,
-          borderRadius: '50%',
-          border: '1.5px solid rgba(255,255,255,0.15)',
-          animation: `ringRipple 1.6s ease-out ${i * 0.35}s infinite`,
-        }} />
+        <div key={i} style={{ position: 'absolute', top: 80 + 50 - i * 18, left: '50%', transform: 'translateX(-50%)', width: 100 + i * 44, height: 100 + i * 44, borderRadius: '50%', border: '1.5px solid rgba(255,255,255,0.12)', animation: `ringRipple 1.6s ease-out ${i * 0.38}s infinite` }} />
       ))}
-
-      {/* Avatar */}
-      <div style={{
-        width: 100, height: 100, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #E0001B, #a80014)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 40, fontWeight: 700, color: '#fff',
-        boxShadow: '0 12px 40px rgba(224,0,27,0.35)',
-        zIndex: 2, marginBottom: 24,
-      }}>
-        R
-      </div>
-
-      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: 500, letterSpacing: 0.5, marginBottom: 8 }}>mobile</p>
-      <h2 style={{ color: '#fff', fontSize: 30, fontWeight: 300, letterSpacing: -0.5, marginBottom: 10 }}>Riverside HVAC</h2>
-
-      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 17 }}>
+      <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'linear-gradient(135deg, #E0001B, #a80014)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, fontWeight: 700, color: '#fff', boxShadow: '0 12px 40px rgba(224,0,27,0.35)', zIndex: 2, marginBottom: 22 }}>R</div>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 6 }}>mobile</p>
+      <h2 style={{ color: '#fff', fontSize: 28, fontWeight: 300, letterSpacing: -0.5, marginBottom: 10 }}>Riverside HVAC</h2>
+      <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 16 }}>
         {noAnswer ? 'Call Ended' : rings === 0 ? 'Calling…' : `Ringing… (${rings})`}
       </p>
-
       <div style={{ flex: 1 }} />
-
-      {/* Action buttons */}
       {!noAnswer && (
-        <div style={{ paddingBottom: 64, display: 'flex', gap: 44 }}>
-          {[
-            { icon: '🔇', label: 'mute' },
-            { icon: '🔊', label: 'speaker' },
-            { icon: '⌨️', label: 'keypad' },
-          ].map(btn => (
-            <div key={btn.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
-                {btn.icon}
-              </div>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{btn.label}</span>
+        <div style={{ paddingBottom: 56, display: 'flex', gap: 40 }}>
+          {[{ icon: '🔇', label: 'mute' }, { icon: '🔊', label: 'speaker' }, { icon: '⌨️', label: 'keypad' }].map(b => (
+            <div key={b.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 54, height: 54, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{b.icon}</div>
+              <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>{b.label}</span>
             </div>
           ))}
         </div>
       )}
-      <div style={{ paddingBottom: noAnswer ? 80 : 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: noAnswer ? 0 : 24 }}>
-        <div style={{
-          width: 72, height: 72, borderRadius: '50%',
-          background: noAnswer ? 'rgba(255,255,255,0.15)' : '#FF3B30',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28,
-        }}>
+      <div style={{ paddingBottom: noAnswer ? 72 : 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 68, height: 68, borderRadius: '50%', background: noAnswer ? 'rgba(255,255,255,0.12)' : '#FF3B30', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>
           {noAnswer ? '✓' : '📵'}
         </div>
-        {!noAnswer && <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>End</span>}
+        {!noAnswer && <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>End</span>}
       </div>
     </div>
   )
@@ -185,48 +138,27 @@ function CallScreen({ rings, noAnswer }: { rings: number; noAnswer: boolean }) {
 
 function RecentsScreen() {
   return (
-    <div style={{ height: '100%', background: '#f2f2f7', overflowY: 'auto' }}>
-      <div style={{ padding: '62px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <h1 style={{ fontSize: 34, fontWeight: 700, color: '#000', letterSpacing: -0.5 }}>Recents</h1>
-        <span style={{ color: '#007AFF', fontSize: 17 }}>Edit</span>
+    <div style={{ height: '100%', background: '#f2f2f7' }}>
+      <div style={{ padding: '60px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <h1 style={{ fontSize: 32, fontWeight: 700, color: '#000', letterSpacing: -0.5 }}>Recents</h1>
+        <span style={{ color: '#007AFF', fontSize: 16 }}>Edit</span>
       </div>
-
-      <div style={{ padding: '0 20px 16px', display: 'flex' }}>
+      <div style={{ padding: '0 20px 14px', display: 'flex' }}>
         {['All', 'Missed'].map((t, i) => (
-          <button key={t} style={{
-            flex: 1, padding: '7px 0',
-            background: i === 0 ? '#007AFF' : 'transparent',
-            border: '1px solid #007AFF',
-            borderRadius: i === 0 ? '8px 0 0 8px' : '0 8px 8px 0',
-            color: i === 0 ? '#fff' : '#007AFF',
-            fontSize: 14, fontWeight: 500, cursor: 'pointer',
-          }}>{t}</button>
+          <button key={t} style={{ flex: 1, padding: '7px 0', background: i === 0 ? '#007AFF' : 'transparent', border: '1px solid #007AFF', borderRadius: i === 0 ? '8px 0 0 8px' : '0 8px 8px 0', color: i === 0 ? '#fff' : '#007AFF', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>{t}</button>
         ))}
       </div>
-
       <div style={{ background: '#fff', borderRadius: 12, margin: '0 16px', overflow: 'hidden' }}>
         {RECENTS.map((call, i) => (
-          <div key={i} style={{
-            display: 'flex', alignItems: 'center', padding: '12px 16px',
-            borderBottom: i < RECENTS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none',
-          }}>
-            <div style={{
-              width: 42, height: 42, borderRadius: '50%',
-              background: call.missed ? 'rgba(224,0,27,0.1)' : '#e5e5ea',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 17, marginRight: 12, flexShrink: 0,
-            }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: i < RECENTS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: call.missed ? 'rgba(224,0,27,0.1)' : '#e5e5ea', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, marginRight: 12, flexShrink: 0 }}>
               {call.missed ? '📵' : '📞'}
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 17, fontWeight: call.missed ? 600 : 400, color: call.missed ? '#E0001B' : '#000' }}>
-                {call.name}
-              </div>
-              <div style={{ fontSize: 13, color: '#8e8e93', marginTop: 1 }}>
-                {call.missed ? 'Missed · ' : 'iPhone · '}{call.time}
-              </div>
+              <div style={{ fontSize: 16, fontWeight: call.missed ? 600 : 400, color: call.missed ? '#E0001B' : '#000' }}>{call.name}</div>
+              <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 1 }}>{call.missed ? 'Missed · ' : 'iPhone · '}{call.time}</div>
             </div>
-            <span style={{ color: '#007AFF', fontSize: 20, marginLeft: 8 }}>ⓘ</span>
+            <span style={{ color: '#007AFF', fontSize: 18 }}>ⓘ</span>
           </div>
         ))}
       </div>
@@ -237,47 +169,42 @@ function RecentsScreen() {
 /* ─── Messages Screen ────────────────────────────────────────────────────────── */
 
 function MessagesScreen({
-  messages, typing, scrollRef, complete,
+  messages, typing, options, onPick, complete, scrollRef,
 }: {
   messages: Msg[]
   typing: boolean
-  scrollRef: React.RefObject<HTMLDivElement | null>
+  options: Option[] | null
+  onPick: (opt: Option) => void
   complete: boolean
+  scrollRef: React.RefObject<HTMLDivElement | null>
 }) {
   const bubble = (from: 'them' | 'me'): React.CSSProperties => ({
-    maxWidth: '76%', padding: '10px 14px',
-    borderRadius: from === 'me' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+    maxWidth: '76%', padding: '9px 13px',
+    borderRadius: from === 'me' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
     background: from === 'me' ? '#007AFF' : '#e8e8ed',
     color: from === 'me' ? '#fff' : '#000',
-    fontSize: 15, lineHeight: 1.4,
+    fontSize: 14, lineHeight: 1.4,
   })
 
   return (
     <div style={{ height: '100%', background: '#fff', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ padding: '54px 16px 12px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: '#f9f9f9', flexShrink: 0 }}>
+      <div style={{ padding: '52px 16px 10px', borderBottom: '1px solid rgba(0,0,0,0.08)', background: '#f9f9f9', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ color: '#007AFF', fontSize: 17 }}>‹</span>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #E0001B, #a80014)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18, fontWeight: 700 }}>R</div>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: '#000' }}>Riverside HVAC</div>
-              <div style={{ fontSize: 12, color: '#8e8e93' }}>Text Message</div>
-            </div>
+          <span style={{ color: '#007AFF', fontSize: 16 }}>‹</span>
+          <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg, #E0001B, #a80014)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 16, fontWeight: 700 }}>R</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#000' }}>Riverside HVAC</div>
+            <div style={{ fontSize: 11, color: '#8e8e93' }}>{typing ? 'typing…' : 'Text Message'}</div>
           </div>
-          <span style={{ color: '#007AFF', fontSize: 22 }}>📞</span>
+          <span style={{ color: '#007AFF', fontSize: 20 }}>📞</span>
         </div>
       </div>
 
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        style={{ flex: 1, overflowY: 'auto', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 7 }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 6 }}>
-          <span style={{ fontSize: 11, color: '#8e8e93', background: '#f2f2f7', padding: '3px 12px', borderRadius: 12 }}>
-            📞 Missed Call · just now
-          </span>
+      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ textAlign: 'center', marginBottom: 4 }}>
+          <span style={{ fontSize: 11, color: '#8e8e93', background: '#f2f2f7', padding: '3px 10px', borderRadius: 10 }}>📞 Missed Call · just now</span>
         </div>
 
         {messages.map((m, i) => (
@@ -288,37 +215,41 @@ function MessagesScreen({
 
         {typing && (
           <div style={{ display: 'flex' }}>
-            <div style={{ ...bubble('them'), display: 'flex', gap: 4, alignItems: 'center', padding: '12px 16px' }}>
-              {[0, 1, 2].map(i => (
-                <div key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#999', animation: `typingDot 1.2s ${i * 0.2}s infinite` }} />
-              ))}
+            <div style={{ ...bubble('them'), display: 'flex', gap: 4, alignItems: 'center', padding: '11px 14px' }}>
+              {[0, 1, 2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#999', animation: `typingDot 1.2s ${i * 0.2}s infinite` }} />)}
             </div>
           </div>
         )}
 
+        {/* Interactive options */}
+        {options && !typing && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, marginTop: 4 }}>
+            {options.map((opt, i) => (
+              <button key={i} onClick={() => onPick(opt)} style={{ background: '#fff', border: '1.5px solid rgba(0,122,255,0.35)', borderRadius: 18, padding: '7px 14px', fontSize: 13, fontWeight: 500, color: '#007AFF', cursor: 'pointer', transition: 'all 0.15s', textAlign: 'left' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,122,255,0.06)'; e.currentTarget.style.borderColor = '#007AFF' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = 'rgba(0,122,255,0.35)' }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {complete && (
-          <div style={{ textAlign: 'center', marginTop: 16 }}>
-            <div style={{
-              display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-              background: 'rgba(76,217,100,0.1)', border: '1px solid rgba(76,217,100,0.3)',
-              borderRadius: 16, padding: '16px 24px',
-            }}>
-              <span style={{ fontSize: 28 }}>✅</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#1B2A4A' }}>Appointment Confirmed</span>
-              <span style={{ fontSize: 12, color: '#64748b' }}>Lead captured while you were on the job.</span>
+          <div style={{ textAlign: 'center', marginTop: 14 }}>
+            <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6, background: 'rgba(76,217,100,0.08)', border: '1px solid rgba(76,217,100,0.25)', borderRadius: 14, padding: '14px 20px' }}>
+              <span style={{ fontSize: 24 }}>✅</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#1B2A4A' }}>Appointment Confirmed</span>
+              <span style={{ fontSize: 11, color: '#64748b' }}>Lead captured while you were on the job.</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Input bar */}
-      <div style={{ padding: '8px 12px 20px', background: '#f9f9f9', borderTop: '1px solid rgba(0,0,0,0.08)', display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-        <div style={{ flex: 1, background: '#fff', borderRadius: 20, padding: '9px 14px', fontSize: 15, color: '#aaa', border: '1px solid rgba(0,0,0,0.1)' }}>
-          iMessage
-        </div>
-        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#007AFF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 700 }}>
-          ↑
-        </div>
+      <div style={{ padding: '7px 10px 18px', background: '#f9f9f9', borderTop: '1px solid rgba(0,0,0,0.08)', display: 'flex', gap: 7, alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ flex: 1, background: '#fff', borderRadius: 18, padding: '8px 12px', fontSize: 14, color: '#aaa', border: '1px solid rgba(0,0,0,0.1)' }}>iMessage</div>
+        <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#e5e5ea', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700 }}>↑</div>
       </div>
     </div>
   )
@@ -331,15 +262,32 @@ export default function DemoPage() {
   const [rings, setRings] = useState(0)
   const [messages, setMessages] = useState<Msg[]>([])
   const [typing, setTyping] = useState(false)
-  const [notif, setNotif] = useState(false)
+  const [options, setOptions] = useState<Option[] | null>(null)
   const [complete, setComplete] = useState(false)
+  const [flowStep, setFlowStep] = useState(0)
+  const [notif, setNotif] = useState(false)
   const [cursor, setCursor] = useState({ x: 195, y: 720, visible: false, clicking: false })
+  const [phoneScale, setPhoneScale] = useState(1)
   const scrollRef = useRef<HTMLDivElement>(null)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
 
+  const PHONE_H = 790
+
+  // Scale phone to fit viewport
+  useEffect(() => {
+    const update = () => {
+      const available = window.innerHeight - 100 // reserve space for top bar + caption
+      setPhoneScale(Math.min(1, available / PHONE_H))
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  // Auto-scroll messages
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-  }, [messages, typing])
+  }, [messages, typing, options])
 
   function schedule(fn: () => void, delay: number) {
     const t = setTimeout(fn, delay)
@@ -349,212 +297,161 @@ export default function DemoPage() {
   function reset() {
     timers.current.forEach(clearTimeout)
     timers.current = []
-    setStage('intro')
-    setRings(0)
-    setMessages([])
-    setTyping(false)
-    setNotif(false)
-    setComplete(false)
+    setStage('intro'); setRings(0); setMessages([]); setTyping(false)
+    setOptions(null); setComplete(false); setFlowStep(0); setNotif(false)
     setCursor({ x: 195, y: 720, visible: false, clicking: false })
+  }
+
+  // Show a flow step's "them" message, then show its options
+  const advanceFlow = useCallback((step: number, msgs: Msg[]) => {
+    if (step >= FLOW.length) return
+    const { them, options: opts } = FLOW[step]
+    setTyping(true)
+    setTimeout(() => {
+      setTyping(false)
+      setMessages([...msgs, { from: 'them', text: them }])
+      setTimeout(() => setOptions(opts), opts ? 400 : 0)
+      if (!opts) setTimeout(() => setComplete(true), 600)
+    }, 900)
+  }, [])
+
+  function pickOption(opt: Option) {
+    setOptions(null)
+    const next = [...messages, { from: 'me' as const, text: opt.text }]
+    setMessages(next)
+
+    if (opt.end) {
+      setTimeout(() => {
+        setTyping(true)
+        setTimeout(() => {
+          setTyping(false)
+          setMessages([...next, { from: 'them', text: 'No problem. You have been opted out. Have a great day.' }])
+          setTimeout(() => setComplete(true), 400)
+        }, 900)
+      }, 400)
+      return
+    }
+
+    const nextStep = flowStep + 1
+    setFlowStep(nextStep)
+    setTimeout(() => advanceFlow(nextStep, next), 400)
   }
 
   function startDemo() {
     reset()
-    // slight delay so reset clears first
-    setTimeout(() => _run(), 50)
-  }
-
-  function _run() {
-    // ── Calling ──────────────────────────────
-    setStage('calling')
-    schedule(() => setRings(1), 1000)
-    schedule(() => setRings(2), 2600)
-    schedule(() => setRings(3), 4200)
-
-    // ── No answer ────────────────────────────
-    schedule(() => setStage('noanswer'), 5800)
-
-    // ── Recents ──────────────────────────────
-    schedule(() => {
-      setStage('recents')
-      setCursor({ x: 195, y: 720, visible: true, clicking: false })
-    }, 7200)
-
-    // Cursor glides toward "Mom" row (~y 235)
-    schedule(() => setCursor(c => ({ ...c, x: 180, y: 235 })), 8200)
-
-    // Notification drops in
-    schedule(() => setNotif(true), 10000)
-
-    // Cursor pauses then redirects to notification
-    schedule(() => setCursor(c => ({ ...c, x: 230, y: 88 })), 10900)
-
-    // Cursor clicks
-    schedule(() => setCursor(c => ({ ...c, clicking: true })), 12200)
-
-    // Open messages
-    schedule(() => {
-      setNotif(false)
-      setCursor(c => ({ ...c, visible: false, clicking: false }))
-      setStage('messages')
-    }, 12600)
-
-    // ── Conversation ─────────────────────────
-    let t = 13200
-    SCRIPT.forEach(({ from, text }) => {
-      if (from === 'them') {
-        schedule(() => setTyping(true), t)
-        schedule(() => {
-          setTyping(false)
-          setMessages(prev => [...prev, { from, text }])
-        }, t + 900)
-        t += 2600
-      } else {
-        schedule(() => setMessages(prev => [...prev, { from, text }]), t + 300)
-        t += 1800
-      }
-    })
-
-    // Complete
-    schedule(() => setComplete(true), t + 600)
+    setTimeout(() => {
+      setStage('calling')
+      schedule(() => setRings(1), 1000)
+      schedule(() => setRings(2), 2600)
+      schedule(() => setRings(3), 4200)
+      schedule(() => setStage('noanswer'), 5800)
+      schedule(() => {
+        setStage('recents')
+        setCursor({ x: 195, y: 720, visible: true, clicking: false })
+      }, 7200)
+      schedule(() => setCursor(c => ({ ...c, x: 178, y: 238 })), 8200)
+      schedule(() => setNotif(true), 10000)
+      schedule(() => setCursor(c => ({ ...c, x: 228, y: 86 })), 10900)
+      schedule(() => setCursor(c => ({ ...c, clicking: true })), 12200)
+      schedule(() => {
+        setNotif(false)
+        setCursor(c => ({ ...c, visible: false, clicking: false }))
+        setStage('messages')
+        // Kick off first flow step
+        setTimeout(() => advanceFlow(0, []), 500)
+      }, 12600)
+    }, 50)
   }
 
   const isLight = stage === 'recents' || stage === 'messages'
 
+  // Caption text
+  const caption =
+    stage === 'intro'                     ? 'A real scenario — automated from the first missed call to a booked appointment.' :
+    stage === 'calling'                   ? '📞 Calling Riverside HVAC…' :
+    stage === 'noanswer'                  ? 'No answer. About to try the next number…' :
+    stage === 'recents'                   ? 'About to dial another number…' :
+    complete                              ? '🎉 Lead captured and appointment booked automatically.' :
+    options                               ? 'Your turn — pick a reply.' :
+    'AutoReplyr is responding…'
+
   return (
     <div style={{
-      minHeight: '100vh', background: '#0a0f1a',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      height: '100vh', background: '#0a0f1a', overflow: 'hidden',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      padding: '16px 0',
+      paddingTop: 12,
     }}>
       {/* Top bar */}
-      <div style={{ width: '100%', maxWidth: 420, padding: '0 24px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5 }}>
-          ← Home
-        </Link>
-        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, fontWeight: 700, letterSpacing: 2.5 }}>LIVE DEMO</span>
-        {stage !== 'intro' ? (
-          <button onClick={reset} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}>
-            Restart
-          </button>
-        ) : <div style={{ width: 56 }} />}
+      <div style={{ width: '100%', maxWidth: 420, padding: '0 24px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <Link href="/" style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, textDecoration: 'none' }}>← Home</Link>
+        <span style={{ color: 'rgba(255,255,255,0.18)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5 }}>LIVE DEMO</span>
+        {stage !== 'intro'
+          ? <button onClick={reset} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, background: 'none', border: 'none', cursor: 'pointer' }}>Restart</button>
+          : <div style={{ width: 52 }} />}
       </div>
 
-      {/* Phone frame */}
-      <div style={{
-        width: 390, height: 790, borderRadius: 50,
-        background: '#000',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 80px 160px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04), inset 0 0 0 1px rgba(255,255,255,0.04)',
-        position: 'relative', overflow: 'hidden', flexShrink: 0,
-      }}>
-        {/* Dynamic island */}
+      {/* Phone — scaled to fit */}
+      <div style={{ width: 390 * phoneScale, height: PHONE_H * phoneScale, position: 'relative', flexShrink: 0 }}>
         <div style={{
-          position: 'absolute', top: 13, left: '50%', transform: 'translateX(-50%)',
-          width: 118, height: 34, borderRadius: 20, background: '#000',
-          zIndex: 30, border: '1px solid #111',
-        }} />
-
-        {/* Status bar */}
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 56,
-          zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '16px 28px 0',
+          position: 'absolute', top: 0, left: 0,
+          width: 390, height: PHONE_H,
+          transform: `scale(${phoneScale})`, transformOrigin: 'top left',
+          borderRadius: 50, background: '#000',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 60px 120px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.04)',
+          overflow: 'hidden',
         }}>
-          <span style={{ fontSize: 15, fontWeight: 600, color: isLight ? '#000' : '#fff', transition: 'color 0.4s' }}>9:41</span>
-          <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-            {[3, 4, 5, 6].map((h, i) => (
-              <div key={i} style={{ width: 3, height: h, background: isLight ? '#000' : '#fff', borderRadius: 1, opacity: i === 3 ? 0.35 : 1, transition: 'background 0.4s' }} />
-            ))}
-            <div style={{ width: 22, height: 11, border: `1.5px solid ${isLight ? '#000' : '#fff'}`, borderRadius: 3, marginLeft: 4, position: 'relative', transition: 'border-color 0.4s' }}>
-              <div style={{ position: 'absolute', left: 2, top: 1.5, width: 14, height: 5, background: isLight ? '#000' : '#fff', borderRadius: 1, transition: 'background 0.4s' }} />
+          {/* Dynamic island */}
+          <div style={{ position: 'absolute', top: 13, left: '50%', transform: 'translateX(-50%)', width: 118, height: 34, borderRadius: 20, background: '#000', zIndex: 30, border: '1px solid #111' }} />
+
+          {/* Status bar */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 56, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 28px 0' }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: isLight ? '#000' : '#fff', transition: 'color 0.4s' }}>9:41</span>
+            <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+              {[3, 4, 5, 6].map((h, i) => <div key={i} style={{ width: 3, height: h, background: isLight ? '#000' : '#fff', borderRadius: 1, opacity: i === 3 ? 0.35 : 1, transition: 'background 0.4s' }} />)}
+              <div style={{ width: 22, height: 11, border: `1.5px solid ${isLight ? '#000' : '#fff'}`, borderRadius: 3, marginLeft: 4, position: 'relative', transition: 'border-color 0.4s' }}>
+                <div style={{ position: 'absolute', left: 2, top: 1.5, width: 14, height: 5, background: isLight ? '#000' : '#fff', borderRadius: 1, transition: 'background 0.4s' }} />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Screen content */}
-        <div style={{ position: 'absolute', inset: 0 }}>
-          {stage === 'intro'    && <IntroScreen onStart={startDemo} />}
-          {(stage === 'calling' || stage === 'noanswer') && <CallScreen rings={rings} noAnswer={stage === 'noanswer'} />}
-          {stage === 'recents'  && <RecentsScreen />}
-          {stage === 'messages' && <MessagesScreen messages={messages} typing={typing} scrollRef={scrollRef} complete={complete} />}
-        </div>
-
-        {/* Notification banner */}
-        <div style={{
-          position: 'absolute',
-          top: notif ? 62 : -130,
-          left: 12, right: 12,
-          background: 'rgba(28,28,30,0.96)',
-          backdropFilter: 'blur(24px)',
-          borderRadius: 16, padding: '14px 16px',
-          zIndex: 50,
-          transition: 'top 0.55s cubic-bezier(0.22,1,0.36,1)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
-          display: 'flex', gap: 12, alignItems: 'flex-start',
-        }}>
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: '#E0001B', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>
-            💬
+          {/* Screen */}
+          <div style={{ position: 'absolute', inset: 0 }}>
+            {stage === 'intro'   && <IntroScreen onStart={startDemo} />}
+            {(stage === 'calling' || stage === 'noanswer') && <CallScreen rings={rings} noAnswer={stage === 'noanswer'} />}
+            {stage === 'recents' && <RecentsScreen />}
+            {stage === 'messages' && <MessagesScreen messages={messages} typing={typing} options={options} onPick={pickOption} complete={complete} scrollRef={scrollRef} />}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Messages</span>
-              <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11 }}>now</span>
-            </div>
-            <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 2 }}>Riverside HVAC</div>
-            <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 13, lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              Sorry we missed your call. Reply YES for a quick response.
+
+          {/* Notification */}
+          <div style={{ position: 'absolute', top: notif ? 62 : -130, left: 12, right: 12, background: 'rgba(28,28,30,0.96)', backdropFilter: 'blur(24px)', borderRadius: 16, padding: '13px 15px', zIndex: 50, transition: 'top 0.55s cubic-bezier(0.22,1,0.36,1)', boxShadow: '0 12px 40px rgba(0,0,0,0.5)', display: 'flex', gap: 11, alignItems: 'flex-start' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#E0001B', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 17 }}>💬</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Messages</span>
+                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>now</span>
+              </div>
+              <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 1 }}>Riverside HVAC</div>
+              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Sorry we missed your call. Reply YES for a quick response.
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Animated cursor */}
-        {cursor.visible && <Cursor x={cursor.x} y={cursor.y} clicking={cursor.clicking} />}
+          {cursor.visible && <Cursor x={cursor.x} y={cursor.y} clicking={cursor.clicking} />}
+        </div>
       </div>
 
-      {/* Caption below phone */}
-      <div style={{ marginTop: 28, textAlign: 'center', maxWidth: 320 }}>
-        {stage === 'intro' && (
-          <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: 13, lineHeight: 1.6 }}>
-            A real scenario — automated from the first missed call to a confirmed appointment.
-          </p>
-        )}
-        {(stage === 'calling' || stage === 'noanswer') && (
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
-            📞 Calling Riverside HVAC… no answer.
-          </p>
-        )}
-        {stage === 'recents' && (
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
-            About to try the next number…
-          </p>
-        )}
-        {(stage === 'messages' || stage === 'complete') && !complete && (
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
-            AutoReplyr already texted back. Watch it qualify the lead.
-          </p>
-        )}
-        {complete && (
-          <p style={{ color: 'rgba(76,217,100,0.7)', fontSize: 13, fontWeight: 500 }}>
-            Lead captured and appointment booked — automatically.
-          </p>
-        )}
-      </div>
+      {/* Caption */}
+      <p style={{ marginTop: 20, color: complete ? 'rgba(76,217,100,0.7)' : options ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.28)', fontSize: 13, textAlign: 'center', maxWidth: 320, lineHeight: 1.5, transition: 'color 0.4s', flexShrink: 0, padding: '0 20px' }}>
+        {caption}
+      </p>
 
       <style>{`
-        @keyframes ringRipple {
-          0%   { transform: translateX(-50%) scale(1); opacity: 0.5; }
-          100% { transform: translateX(-50%) scale(2.6); opacity: 0; }
-        }
-        @keyframes clickPulse {
-          0%   { transform: scale(0.4); opacity: 0.8; }
-          100% { transform: scale(2.2); opacity: 0; }
-        }
-        @keyframes typingDot {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-          30%           { transform: translateY(-4px); opacity: 1; }
-        }
+        @keyframes ringRipple { 0% { transform: translateX(-50%) scale(1); opacity: 0.5; } 100% { transform: translateX(-50%) scale(2.8); opacity: 0; } }
+        @keyframes clickPulse { 0% { transform: scale(0.4); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
+        @keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
       `}</style>
     </div>
   )
