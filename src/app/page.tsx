@@ -484,6 +484,27 @@ function Hero() {
                 }}
               />
               <PhoneMockup className="phone-mockup" />
+              {/* Demo link badge */}
+              <Link
+                href="/demo"
+                className="absolute left-1/2 -translate-x-1/2"
+                style={{
+                  bottom: -18,
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: '#1B2A4A', color: '#fff',
+                  fontSize: 12, fontWeight: 600,
+                  padding: '7px 16px', borderRadius: 20,
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 14px rgba(27,42,74,0.25)',
+                  whiteSpace: 'nowrap',
+                  transition: 'background 0.2s, transform 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E0001B' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1B2A4A' }}
+              >
+                Try the live demo
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1.5 6h9M7 2.5l3.5 3.5L7 9.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </Link>
             </div>
           </div>
         </div>
