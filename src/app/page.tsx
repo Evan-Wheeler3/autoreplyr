@@ -636,7 +636,7 @@ function HowItWorks() {
   return (
     <section id="how-it-works" className="py-12 sm:py-20 px-5 sm:px-8" style={{ background: '#f4f6f9' }}>
       <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-12 flex items-end justify-between gap-6">
+        <div ref={ref} className="mb-12 flex items-start justify-between gap-6">
           <div>
             <p
               className="text-xs font-bold tracking-widest uppercase mb-4"
