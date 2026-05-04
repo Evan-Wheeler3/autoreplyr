@@ -636,14 +636,14 @@ function HowItWorks() {
   return (
     <section id="how-it-works" className="py-12 sm:py-20 px-5 sm:px-8" style={{ background: '#f4f6f9' }}>
       <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-12 flex items-start justify-between gap-6">
-          <div>
-            <p
-              className="text-xs font-bold tracking-widest uppercase mb-4"
-              style={{ color: '#E0001B', opacity: inView ? 1 : 0, transition: 'opacity 0.5s ease' }}
-            >
-              How It Works
-            </p>
+        <div ref={ref} className="mb-12">
+          <p
+            className="text-xs font-bold tracking-widest uppercase mb-4"
+            style={{ color: '#E0001B', opacity: inView ? 1 : 0, transition: 'opacity 0.5s ease' }}
+          >
+            How It Works
+          </p>
+          <div className="flex items-center justify-between gap-6">
             <h2
               className="font-bold tracking-tight"
               style={{
@@ -656,15 +656,15 @@ function HowItWorks() {
             >
               Three steps.<br />Zero effort.
             </h2>
+            <Link
+              href="/demo"
+              className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95 shrink-0"
+              style={{ background: '#E0001B', color: '#fff', boxShadow: '0 4px 16px rgba(224,0,27,0.28)', textDecoration: 'none' }}
+            >
+              See it in action
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
           </div>
-          <Link
-            href="/demo"
-            className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95 shrink-0"
-            style={{ background: '#E0001B', color: '#fff', boxShadow: '0 4px 16px rgba(224,0,27,0.28)', textDecoration: 'none' }}
-          >
-            See it in action
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </Link>
         </div>
 
         <div className="step-gap flex flex-col sm:flex-row justify-between items-center gap-12">
