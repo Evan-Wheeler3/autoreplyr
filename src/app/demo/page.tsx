@@ -48,12 +48,6 @@ const FLOW: FlowStep[] = [
   },
 ]
 
-const RECENTS = [
-  { name: 'Riverside HVAC', time: 'just now', missed: true },
-  { name: 'Mom',            time: '2m ago',   missed: false },
-  { name: 'Dr. Martinez',   time: '1h ago',   missed: false },
-  { name: 'Jake Wilson',    time: '3h ago',   missed: false },
-]
 
 /* ─── Cursor ─────────────────────────────────────────────────────────────────── */
 
@@ -134,31 +128,82 @@ function CallScreen({ rings, noAnswer }: { rings: number; noAnswer: boolean }) {
   )
 }
 
-/* ─── Recents Screen ─────────────────────────────────────────────────────────── */
+/* ─── Search Screen ──────────────────────────────────────────────────────────── */
 
-function RecentsScreen() {
+const COMPETITORS = [
+  { name: 'Cool Breeze HVAC',    stars: 4.2, reviews: 89,  phone: '(555) 448-3291', tag: 'Open · Local business' },
+  { name: 'Apex Air & Heat',     stars: 4.6, reviews: 212, phone: '(555) 771-8842', tag: 'Open · Highly rated' },
+  { name: 'TempRight Services',  stars: 3.9, reviews: 41,  phone: '(555) 229-1073', tag: 'Closes at 5pm' },
+]
+
+function Stars({ rating }: { rating: number }) {
   return (
-    <div style={{ height: '100%', background: '#f2f2f7' }}>
-      <div style={{ padding: '60px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700, color: '#000', letterSpacing: -0.5 }}>Recents</h1>
-        <span style={{ color: '#007AFF', fontSize: 16 }}>Edit</span>
+    <span style={{ color: '#f5a623', fontSize: 11 }}>
+      {'★'.repeat(Math.floor(rating))}{'☆'.repeat(5 - Math.floor(rating))}
+    </span>
+  )
+}
+
+function SearchScreen() {
+  return (
+    <div style={{ height: '100%', background: '#fff', overflowY: 'auto' }}>
+      {/* Browser chrome */}
+      <div style={{ background: '#f1f3f4', paddingTop: 54, paddingBottom: 10, paddingLeft: 12, paddingRight: 12, borderBottom: '1px solid #e0e0e0', flexShrink: 0 }}>
+        <div style={{ background: '#fff', borderRadius: 22, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#9aa0a6" strokeWidth="2"/><path d="M20 20l-3-3" stroke="#9aa0a6" strokeWidth="2" strokeLinecap="round"/></svg>
+          <span style={{ fontSize: 12, color: '#202124', flex: 1 }}>HVAC companies in my area</span>
+          <span style={{ fontSize: 13, color: '#70757a' }}>✕</span>
+        </div>
       </div>
-      <div style={{ padding: '0 20px 14px', display: 'flex' }}>
-        {['All', 'Missed'].map((t, i) => (
-          <button key={t} style={{ flex: 1, padding: '7px 0', background: i === 0 ? '#007AFF' : 'transparent', border: '1px solid #007AFF', borderRadius: i === 0 ? '8px 0 0 8px' : '0 8px 8px 0', color: i === 0 ? '#fff' : '#007AFF', fontSize: 14, fontWeight: 500, cursor: 'pointer' }}>{t}</button>
-        ))}
-      </div>
-      <div style={{ background: '#fff', borderRadius: 12, margin: '0 16px', overflow: 'hidden' }}>
-        {RECENTS.map((call, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: i < RECENTS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : 'none' }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: call.missed ? 'rgba(224,0,27,0.1)' : '#e5e5ea', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, marginRight: 12, flexShrink: 0 }}>
-              {call.missed ? '📵' : '📞'}
+
+      <div style={{ padding: '10px 12px' }}>
+        <p style={{ fontSize: 10, color: '#70757a', marginBottom: 12 }}>About 2,430,000 results (0.48 seconds)</p>
+
+        {/* Local pack */}
+        <div style={{ border: '1px solid #dfe1e5', borderRadius: 10, overflow: 'hidden', marginBottom: 14 }}>
+          {/* Fake map */}
+          <div style={{ height: 82, background: 'linear-gradient(135deg, #e8f0e8, #c8dfc8)', position: 'relative' }}>
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 17px,rgba(0,0,0,0.04) 17px,rgba(0,0,0,0.04) 18px),repeating-linear-gradient(90deg,transparent,transparent 17px,rgba(0,0,0,0.04) 17px,rgba(0,0,0,0.04) 18px)' }} />
+            {[{ x: 28, y: 38 }, { x: 54, y: 52 }, { x: 72, y: 25 }].map((p, i) => (
+              <div key={i} style={{ position: 'absolute', left: `${p.x}%`, top: `${p.y}%`, width: 20, height: 20, borderRadius: '50% 50% 50% 0', background: i === 0 ? '#E0001B' : '#1a73e8', transform: 'rotate(-45deg)', boxShadow: '0 2px 5px rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ transform: 'rotate(45deg)', color: '#fff', fontSize: 8, fontWeight: 700 }}>{i + 1}</span>
+              </div>
+            ))}
+          </div>
+
+          {COMPETITORS.map((biz, i) => (
+            <div key={i} style={{ padding: '9px 12px', borderTop: '1px solid #f0f0f0', background: '#fff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a', margin: '0 0 2px' }}>{i + 1}. {biz.name}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#202124' }}>{biz.stars}</span>
+                    <Stars rating={biz.stars} />
+                    <span style={{ fontSize: 10, color: '#70757a' }}>({biz.reviews})</span>
+                  </div>
+                  <p style={{ fontSize: 10, color: '#70757a', margin: 0 }}>{biz.tag}</p>
+                </div>
+                <div style={{ fontSize: 11, color: '#1a73e8', background: '#e8f0fe', padding: '5px 9px', borderRadius: 12, fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  {biz.phone}
+                </div>
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 16, fontWeight: call.missed ? 600 : 400, color: call.missed ? '#E0001B' : '#000' }}>{call.name}</div>
-              <div style={{ fontSize: 12, color: '#8e8e93', marginTop: 1 }}>{call.missed ? 'Missed · ' : 'iPhone · '}{call.time}</div>
-            </div>
-            <span style={{ color: '#007AFF', fontSize: 18 }}>ⓘ</span>
+          ))}
+
+          <div style={{ padding: '9px 12px', borderTop: '1px solid #f0f0f0', textAlign: 'center' }}>
+            <span style={{ fontSize: 12, color: '#1a73e8', fontWeight: 500 }}>More HVAC businesses ›</span>
+          </div>
+        </div>
+
+        {/* Organic results */}
+        {[
+          { url: 'bestHVACreviews.com › top-hvac-near-you', title: 'Top 10 HVAC Companies Near You – 2024 Reviews', desc: 'Compare local HVAC contractors. Read verified reviews and get free quotes from trusted pros…' },
+          { url: 'yelp.com › search › hvac-near-me', title: 'Best HVAC Near Me – Yelp', desc: 'Find top-rated HVAC companies. Read reviews from real customers and contact businesses directly…' },
+        ].map((r, i) => (
+          <div key={i} style={{ marginBottom: 14 }}>
+            <p style={{ fontSize: 10, color: '#202124', margin: '0 0 1px' }}>{r.url}</p>
+            <p style={{ fontSize: 13, color: '#1a0dab', margin: '0 0 2px', fontWeight: 500 }}>{r.title}</p>
+            <p style={{ fontSize: 11, color: '#4d5156', margin: 0, lineHeight: 1.5 }}>{r.desc}</p>
           </div>
         ))}
       </div>
@@ -349,7 +394,7 @@ export default function DemoPage() {
         setStage('recents')
         setCursor({ x: 195, y: 720, visible: true, clicking: false })
       }, 7200)
-      schedule(() => setCursor(c => ({ ...c, x: 178, y: 238 })), 8200)
+      schedule(() => setCursor(c => ({ ...c, x: 310, y: 272 })), 8200)
       schedule(() => setNotif(true), 10000)
       schedule(() => setCursor(c => ({ ...c, x: 228, y: 86 })), 10900)
       schedule(() => setCursor(c => ({ ...c, clicking: true })), 12200)
@@ -369,8 +414,8 @@ export default function DemoPage() {
   const caption =
     stage === 'intro'                     ? 'A real scenario — automated from the first missed call to a booked appointment.' :
     stage === 'calling'                   ? '📞 Calling Riverside HVAC…' :
-    stage === 'noanswer'                  ? 'No answer. About to try the next number…' :
-    stage === 'recents'                   ? 'About to dial another number…' :
+    stage === 'noanswer'                  ? 'No answer. Now searching for a competitor…' :
+    stage === 'recents'                   ? 'About to call a competitor…' :
     complete                              ? '🎉 Lead captured and appointment booked automatically.' :
     options                               ? 'Your turn — pick a reply.' :
     'AutoReplyr is responding…'
@@ -420,7 +465,7 @@ export default function DemoPage() {
           <div style={{ position: 'absolute', inset: 0 }}>
             {stage === 'intro'   && <IntroScreen onStart={startDemo} />}
             {(stage === 'calling' || stage === 'noanswer') && <CallScreen rings={rings} noAnswer={stage === 'noanswer'} />}
-            {stage === 'recents' && <RecentsScreen />}
+            {stage === 'recents' && <SearchScreen />}
             {stage === 'messages' && <MessagesScreen messages={messages} typing={typing} options={options} onPick={pickOption} complete={complete} scrollRef={scrollRef} />}
           </div>
 
