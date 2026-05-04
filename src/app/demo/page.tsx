@@ -75,14 +75,14 @@ function IntroScreen({ onStart }: { onStart: () => void }) {
   const [pulse, setPulse] = useState(false)
   useEffect(() => { const t = setInterval(() => setPulse(p => !p), 1400); return () => clearInterval(t) }, [])
   return (
-    <div style={{ height: '100%', background: 'linear-gradient(160deg, #1B2A4A 0%, #0f1923 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 36px', gap: 28 }}>
+    <div style={{ height: '100%', background: '#ffffff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 36px', gap: 28 }}>
       <div style={{ textAlign: 'center' }}>
         <p style={{ color: '#E0001B', fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18 }}>AutoReplyr Demo</p>
-        <h2 style={{ color: '#fff', fontSize: 24, fontWeight: 700, lineHeight: 1.3, letterSpacing: -0.5, marginBottom: 12 }}>
+        <h2 style={{ color: '#1B2A4A', fontSize: 24, fontWeight: 700, lineHeight: 1.3, letterSpacing: -0.5, marginBottom: 12 }}>
           See what happens after<br />a missed call.
         </h2>
-        <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, lineHeight: 1.65 }}>
-          Call a local HVAC company. They are busy on a job. Watch AutoReplyr take over — then take part in the conversation.
+        <p style={{ color: '#64748b', fontSize: 13, lineHeight: 1.65 }}>
+          Call a local HVAC company. They are busy on a job. Watch AutoReplyr take over, then take part in the conversation.
         </p>
       </div>
       <button onClick={onStart} style={{ width: 72, height: 72, borderRadius: '50%', background: '#4CD964', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, boxShadow: pulse ? '0 0 0 16px rgba(76,217,100,0.12), 0 0 0 32px rgba(76,217,100,0.05)' : '0 0 0 8px rgba(76,217,100,0.12)', transition: 'box-shadow 0.7s ease, transform 0.15s' }} onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)' }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}>
@@ -408,7 +408,7 @@ export default function DemoPage() {
     }, 50)
   }
 
-  const isLight = stage === 'recents' || stage === 'messages'
+  const isLight = stage === 'intro' || stage === 'recents' || stage === 'messages'
 
   // Caption text
   const caption =
@@ -422,17 +422,17 @@ export default function DemoPage() {
 
   return (
     <div style={{
-      height: '100vh', background: '#0a0f1a', overflow: 'hidden',
+      height: '100vh', background: '#E0001B', overflow: 'hidden',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       paddingTop: 12,
     }}>
       {/* Top bar */}
       <div style={{ width: '100%', maxWidth: 420, padding: '0 24px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <Link href="/" style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, textDecoration: 'none' }}>← Home</Link>
-        <span style={{ color: 'rgba(255,255,255,0.18)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5 }}>LIVE DEMO</span>
+        <Link href="/" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, textDecoration: 'none' }}>← Home</Link>
+        <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5 }}>LIVE DEMO</span>
         {stage !== 'intro'
-          ? <button onClick={reset} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, background: 'none', border: 'none', cursor: 'pointer' }}>Restart</button>
+          ? <button onClick={reset} style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, background: 'none', border: 'none', cursor: 'pointer' }}>Restart</button>
           : <div style={{ width: 52 }} />}
       </div>
 
@@ -442,13 +442,13 @@ export default function DemoPage() {
           position: 'absolute', top: 0, left: 0,
           width: 390, height: PHONE_H,
           transform: `scale(${phoneScale})`, transformOrigin: 'top left',
-          borderRadius: 50, background: '#000',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 60px 120px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.04)',
+          borderRadius: 50, background: '#fff',
+          border: '1px solid rgba(0,0,0,0.12)',
+          boxShadow: '0 40px 80px rgba(0,0,0,0.25), 0 0 0 6px rgba(255,255,255,0.15)',
           overflow: 'hidden',
         }}>
           {/* Dynamic island */}
-          <div style={{ position: 'absolute', top: 13, left: '50%', transform: 'translateX(-50%)', width: 118, height: 34, borderRadius: 20, background: '#000', zIndex: 30, border: '1px solid #111' }} />
+          <div style={{ position: 'absolute', top: 13, left: '50%', transform: 'translateX(-50%)', width: 118, height: 34, borderRadius: 20, background: '#1a1a1a', zIndex: 30 }} />
 
           {/* Status bar */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 56, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 28px 0' }}>
@@ -489,7 +489,7 @@ export default function DemoPage() {
       </div>
 
       {/* Caption */}
-      <p style={{ marginTop: 20, color: complete ? 'rgba(76,217,100,0.7)' : options ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.28)', fontSize: 13, textAlign: 'center', maxWidth: 320, lineHeight: 1.5, transition: 'color 0.4s', flexShrink: 0, padding: '0 20px' }}>
+      <p style={{ marginTop: 20, color: complete ? 'rgba(255,255,255,1)' : options ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.6)', fontSize: 13, textAlign: 'center', maxWidth: 320, lineHeight: 1.5, transition: 'color 0.4s', flexShrink: 0, padding: '0 20px' }}>
         {caption}
       </p>
 
