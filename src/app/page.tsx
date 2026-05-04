@@ -636,32 +636,43 @@ function HowItWorks() {
   return (
     <section id="how-it-works" className="py-12 sm:py-20 px-5 sm:px-8" style={{ background: '#f4f6f9' }}>
       <div className="max-w-6xl mx-auto">
-        <div ref={ref} className="mb-12">
-          <p
-            className="text-xs font-bold tracking-widest uppercase mb-4"
-            style={{ color: '#E0001B', opacity: inView ? 1 : 0, transition: 'opacity 0.5s ease' }}
+        <div ref={ref} className="mb-12 flex items-end justify-between gap-6">
+          <div>
+            <p
+              className="text-xs font-bold tracking-widest uppercase mb-4"
+              style={{ color: '#E0001B', opacity: inView ? 1 : 0, transition: 'opacity 0.5s ease' }}
+            >
+              How It Works
+            </p>
+            <h2
+              className="font-bold tracking-tight"
+              style={{
+                fontSize: 'clamp(36px, 5vw, 64px)',
+                color: '#1B2A4A', lineHeight: 1.1, letterSpacing: -2,
+                opacity: inView ? 1 : 0,
+                transform: inView ? 'translateY(0)' : 'translateY(24px)',
+                transition: 'opacity 0.55s ease 0.08s, transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.08s',
+              }}
+            >
+              Three steps.<br />Zero effort.
+            </h2>
+          </div>
+          <Link
+            href="/demo"
+            className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95 shrink-0"
+            style={{ background: '#E0001B', color: '#fff', boxShadow: '0 4px 16px rgba(224,0,27,0.28)', textDecoration: 'none' }}
           >
-            How It Works
-          </p>
-          <h2
-            className="font-bold tracking-tight"
-            style={{
-              fontSize: 'clamp(36px, 5vw, 64px)',
-              color: '#1B2A4A', lineHeight: 1.1, letterSpacing: -2,
-              opacity: inView ? 1 : 0,
-              transform: inView ? 'translateY(0)' : 'translateY(24px)',
-              transition: 'opacity 0.55s ease 0.08s, transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.08s',
-            }}
-          >
-            Three steps.<br />Zero effort.
-          </h2>
+            See it in action
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
         </div>
 
         <div className="step-gap flex flex-col sm:flex-row justify-between items-center gap-12">
           {steps.map((s, i) => <StepCard key={i} step={s} delay={i * 130} />)}
         </div>
 
-        <div className="mt-12 flex justify-center">
+        {/* Mobile-only button below steps */}
+        <div className="mt-10 flex justify-center sm:hidden">
           <Link
             href="/demo"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-95"
