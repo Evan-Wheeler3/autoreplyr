@@ -15,8 +15,9 @@ export interface OnboardingPayload {
 
   // Step 2
   voipProvider: string
-  providerApiKey?: string  // for API-key providers
-  providerPhoneNumber: string
+  providerApiKey?: string        // for API-key providers
+  providerPhoneNumber: string    // E.164 display number
+  providerPhoneNumberId?: string // provider-specific ID (e.g. OpenPhone phoneNumberId)
 
   // Step 3
   openingMessage: string
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
     voipProvider,
     providerApiKey,
     providerPhoneNumber,
+    providerPhoneNumberId,
     openingMessage,
   } = payload
 
@@ -110,6 +112,7 @@ export async function POST(req: Request) {
         voip_provider: voipProvider,
         provider_api_key: providerApiKey || null,
         provider_phone_number: providerPhoneNumber,
+        provider_phone_number_id: providerPhoneNumberId || null,
         stripe_customer_id: customer.id,
         subscription_status: 'cancelled',
         status: 'active',

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import type { OnboardingPayload } from '@/app/api/onboarding/route'
+import type { OpenPhoneNumber } from '@/lib/providers/openphone'
 
 // ── constants ──────────────────────────────────────────────────────────────
 
@@ -125,6 +126,7 @@ interface FormState {
   voipProvider: string
   providerApiKey: string
   providerPhoneNumber: string
+  providerPhoneNumberId: string // OpenPhone phoneNumberId; empty for E.164 providers
   openingMessage: string
 }
 
@@ -248,6 +250,9 @@ function Step1({
 
 // ── Step 2: VoIP Provider ──────────────────────────────────────────────────
 
+// Providers where we do a live number lookup after the API key is entered.
+const LOOKUP_PROVIDERS = ['openphone']
+
 function Step2({
   form,
   setForm,
@@ -259,17 +264,49 @@ function Step2({
   onNext: () => void
   onBack: () => void
 }) {
+  const [numbers, setNumbers] = useState<OpenPhoneNumber[]>([])
+  const [lookupLoading, setLookupLoading] = useState(false)
+  const [lookupError, setLookupError] = useState('')
+
   const set = (key: keyof FormState) => (v: string) =>
     setForm((f) => ({ ...f, [key]: v }))
 
   const selected = PROVIDERS.find((p) => p.value === form.voipProvider)
+  const needsLookup = selected && LOOKUP_PROVIDERS.includes(selected.value)
+
+  const fetchNumbers = useCallback(async (provider: string, apiKey: string) => {
+    if (!apiKey.trim()) return
+    setLookupLoading(true)
+    setLookupError('')
+    setNumbers([])
+    setForm((f) => ({ ...f, providerPhoneNumber: '', providerPhoneNumberId: '' }))
+    try {
+      const res = await fetch(
+        `/api/onboarding/phone-numbers?provider=${provider}&apiKey=${encodeURIComponent(apiKey)}`,
+      )
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to fetch numbers')
+      setNumbers(data.numbers ?? [])
+    } catch (err) {
+      setLookupError(err instanceof Error ? err.message : 'Could not load phone numbers')
+    } finally {
+      setLookupLoading(false)
+    }
+  }, [setForm])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.voipProvider) return
     if (selected?.oauthComingSoon) return
+    // For lookup providers, require a number selection
+    if (needsLookup && !form.providerPhoneNumberId) return
     onNext()
   }
+
+  const canContinue =
+    !!form.voipProvider &&
+    !selected?.oauthComingSoon &&
+    (needsLookup ? !!form.providerPhoneNumberId : !!form.providerPhoneNumber)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -281,69 +318,127 @@ function Step2({
               key={p.value}
               type="button"
               onClick={() => {
-                set('voipProvider')(p.value)
-                set('providerApiKey')('')
+                setForm((f) => ({
+                  ...f,
+                  voipProvider: p.value,
+                  providerApiKey: '',
+                  providerPhoneNumber: '',
+                  providerPhoneNumberId: '',
+                }))
+                setNumbers([])
+                setLookupError('')
               }}
               className={`text-left px-3 py-2.5 rounded-lg border text-sm font-medium transition-all ${
                 form.voipProvider === p.value
                   ? 'border-[#1B2A4A] bg-[#1B2A4A]/5 text-[#1B2A4A]'
                   : 'border-gray-200 text-gray-700 hover:border-gray-400'
-              } ${p.oauthComingSoon ? 'opacity-50' : ''}`}
+              } ${p.oauthComingSoon ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={p.oauthComingSoon}
             >
               {p.label}
-              {p.oauthComingSoon && <span className="block text-xs text-gray-400 font-normal">Coming soon</span>}
+              {p.oauthComingSoon && (
+                <span className="block text-xs text-gray-400 font-normal">Connect after signup</span>
+              )}
             </button>
           ))}
         </div>
         <p className="text-xs text-gray-400 mt-2">
           Don&apos;t see your provider?{' '}
-          <a href="mailto:evan@velza.com" className="underline">Email us</a> — we may be able to add it.
+          <a href="mailto:evan@velza.com" className="underline">Email us</a>
         </p>
       </div>
 
-      {selected && !selected.oauthComingSoon && (
+      {selected && !selected.oauthComingSoon && selected.authType === 'api_key' && (
         <div className="space-y-4 border-t pt-4">
-          <div>
-            <Label>Business phone number <span className="text-gray-400 font-normal">(the number AutoReplyr will text from)</span></Label>
-            <Input
-              value={form.providerPhoneNumber}
-              onChange={set('providerPhoneNumber')}
-              type="tel"
-              placeholder="+16155551234"
-              required
-            />
-          </div>
 
-          {selected.authType === 'api_key' && (
-            <div>
-              <Label>{selected.apiKeyLabel ?? 'API Key'}</Label>
-              <Input
+          {/* API key input */}
+          <div>
+            <Label>{selected.apiKeyLabel ?? 'API Key'}</Label>
+            <div className="flex gap-2">
+              <input
                 value={form.providerApiKey}
-                onChange={set('providerApiKey')}
+                onChange={(e) => set('providerApiKey')(e.target.value)}
                 placeholder={selected.apiKeyPlaceholder}
                 required
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B2A4A] focus:border-transparent"
               />
-              <p className="text-xs text-gray-400 mt-1">
-                We&apos;ll send you setup instructions after payment so you can finish the connection in 5 minutes.
-              </p>
+              {needsLookup && (
+                <button
+                  type="button"
+                  onClick={() => fetchNumbers(selected.value, form.providerApiKey)}
+                  disabled={!form.providerApiKey.trim() || lookupLoading}
+                  className="px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 disabled:opacity-50 whitespace-nowrap"
+                >
+                  {lookupLoading ? 'Loading…' : 'Load numbers'}
+                </button>
+              )}
+            </div>
+            {lookupError && (
+              <p className="text-xs text-red-600 mt-1">{lookupError}</p>
+            )}
+          </div>
+
+          {/* Number picker — shown after lookup for OpenPhone */}
+          {needsLookup && numbers.length > 0 && (
+            <div>
+              <Label>Select your business number</Label>
+              <div className="space-y-2">
+                {numbers.map((n) => (
+                  <button
+                    key={n.id}
+                    type="button"
+                    onClick={() => setForm((f) => ({
+                      ...f,
+                      providerPhoneNumber: n.phoneNumber,
+                      providerPhoneNumberId: n.id,
+                    }))}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg border text-sm transition-all ${
+                      form.providerPhoneNumberId === n.id
+                        ? 'border-[#1B2A4A] bg-[#1B2A4A]/5 text-[#1B2A4A]'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <span className="font-medium">{n.phoneNumber}</span>
+                    {n.name && <span className="text-gray-400 ml-2">{n.name}</span>}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          {selected.authType === 'oauth' && !selected.oauthComingSoon && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800">
-              After payment, we&apos;ll send a link to connect your {selected.label} account via OAuth.
+          {/* E.164 input for providers without lookup */}
+          {!needsLookup && (
+            <div>
+              <Label>Business phone number <span className="text-gray-400 font-normal">(the number AutoReplyr texts from)</span></Label>
+              <Input
+                value={form.providerPhoneNumber}
+                onChange={set('providerPhoneNumber')}
+                type="tel"
+                placeholder="+16155551234"
+                required
+              />
             </div>
           )}
         </div>
       )}
 
+      {selected?.authType === 'oauth' && !selected.oauthComingSoon && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800 border-t mt-4 pt-4">
+          After completing checkout, you&apos;ll connect your {selected.label} account via OAuth from your dashboard.
+        </div>
+      )}
+
       <div className="flex gap-3 pt-2">
-        <button type="button" onClick={onBack} className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-3 font-medium hover:bg-gray-50 transition-colors">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-3 font-medium hover:bg-gray-50 transition-colors"
+        >
           ← Back
         </button>
         <button
           type="submit"
-          disabled={!form.voipProvider || (selected?.oauthComingSoon ?? false)}
+          disabled={!canContinue}
           className="flex-1 bg-[#1B2A4A] text-white rounded-lg py-3 font-medium hover:bg-[#243761] transition-colors disabled:opacity-40"
         >
           Continue →
@@ -445,6 +540,7 @@ function Step4({
       voipProvider: form.voipProvider,
       providerApiKey: form.providerApiKey || undefined,
       providerPhoneNumber: form.providerPhoneNumber,
+      providerPhoneNumberId: form.providerPhoneNumberId || undefined,
       openingMessage: form.openingMessage,
     }
 
@@ -545,6 +641,7 @@ export default function OnboardingPage() {
     voipProvider: '',
     providerApiKey: '',
     providerPhoneNumber: '',
+    providerPhoneNumberId: '',
     openingMessage: DEFAULT_OPENING,
   })
 
