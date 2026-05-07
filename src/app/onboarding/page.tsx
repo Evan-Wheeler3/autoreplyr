@@ -251,7 +251,7 @@ function Step1({
 // ── Step 2: VoIP Provider ──────────────────────────────────────────────────
 
 // Providers where we do a live number lookup after the API key is entered.
-const LOOKUP_PROVIDERS = ['openphone']
+const LOOKUP_PROVIDERS = ['openphone', 'aircall']
 
 function Step2({
   form,

@@ -5,11 +5,11 @@
  * can choose from. Used in the onboarding form so the client picks their
  * number rather than typing an opaque ID.
  *
- * Currently supports: openphone
- * Future: extend to other API-key providers as needed.
+ * Supported providers: openphone, aircall
  */
 
-import { listPhoneNumbers } from '@/lib/providers/openphone'
+import { listPhoneNumbers as openphoneNumbers } from '@/lib/providers/openphone'
+import { listPhoneNumbers as aircallNumbers } from '@/lib/providers/aircall'
 import { NextResponse } from 'next/server'
 
 export async function GET(req: Request) {
@@ -23,7 +23,22 @@ export async function GET(req: Request) {
 
   try {
     if (provider === 'openphone') {
-      const numbers = await listPhoneNumbers(apiKey)
+      const raw = await openphoneNumbers(apiKey)
+      const numbers = raw.map((n) => ({
+        id: n.id,
+        phoneNumber: n.phoneNumber,
+        label: n.name ? `${n.name} (${n.phoneNumber})` : n.phoneNumber,
+      }))
+      return NextResponse.json({ numbers })
+    }
+
+    if (provider === 'aircall') {
+      const raw = await aircallNumbers(apiKey)
+      const numbers = raw.map((n) => ({
+        id: String(n.id),
+        phoneNumber: n.direct_number,
+        label: n.name ? `${n.name} (${n.direct_number})` : n.direct_number,
+      }))
       return NextResponse.json({ numbers })
     }
 

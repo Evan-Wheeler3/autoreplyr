@@ -8,9 +8,9 @@
 
 import type { Provider } from './types'
 import { openphone } from './openphone'
+import { aircall } from './aircall'
 // Future providers are added here as they are built:
 // import { ringcentral } from './ringcentral'
-// import { aircall } from './aircall'
 // import { dialpad } from './dialpad'
 // import { justcall } from './justcall'
 // import { kixie } from './kixie'
@@ -19,6 +19,7 @@ import { openphone } from './openphone'
 
 const REGISTRY: Record<string, Provider> = {
   openphone,
+  aircall,
   // ringcentral,
   // aircall,
   // dialpad,
