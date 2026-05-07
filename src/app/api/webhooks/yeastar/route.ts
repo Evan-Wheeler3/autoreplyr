@@ -1,187 +1,126 @@
+/**
+ * Yeastar P-Series webhook handler
+ *
+ * Events handled:
+ *   30012 (Call End Details) — missed inbound call → opens lead + sends SMS
+ *   sms.received             — inbound SMS → advances conversation flow
+ *
+ * Field reference for Event 30012:
+ *   https://help.yeastar.com/en/p-series-cloud-edition/event-list/30012-call-end-details.html
+ *   callDirection: 0=inbound, 1=outbound, 2=internal
+ *   callStatus:    0=answered, 3=unanswered/missed
+ *
+ * Business number matched by `to` (call) or `To` (SMS) against
+ * clients.provider_phone_number (E.164).
+ *
+ * provider_metadata.pbx_domain is required for SMS send.
+ * provider_api_key is the Yeastar API token.
+ *
+ * Webhook registration is manual — client pastes
+ *   https://autoreplyr.com/api/webhooks/yeastar
+ * into Yeastar Admin > Event Center > Webhook Notifications.
+ */
+
 import { createAdminClient } from '@/lib/supabase/server'
+import {
+  handleMissedCall,
+  handleInboundSMS,
+  isSubscriptionActive,
+} from '@/lib/missed-call'
+import { yeastar } from '@/lib/providers/yeastar'
 import { NextResponse } from 'next/server'
+import type { ClientRow } from '@/lib/missed-call'
 
-// Yeastar P-Series Event 30012 = Call End Details
-// Sent for every call that ends. We filter for missed inbound calls.
-// https://help.yeastar.com/en/p-series-cloud-edition/event-list/30012-call-end-details.html
-
-interface YeastarCallEvent {
-  event: number // 30012
-  callid?: string
-  from?: string        // caller number
-  to?: string          // dialed number (client's business number)
-  callDirection?: number // 0 = inbound, 1 = outbound, 2 = internal
-  callStatus?: number  // 0 = answered, 3 = unanswered/missed
-  duration?: number    // 0 for missed calls
-  [key: string]: unknown
+type ClientFull = ClientRow & {
+  provider_api_key: string | null
+  provider_metadata: Record<string, unknown>
 }
 
-const YEASTAR_API_BASE = process.env.YEASTAR_API_BASE ?? ''
+type CallEndEvent = {
+  event: number        // 30012
+  from: string         // caller E.164
+  to: string           // business E.164
+  callDirection: number // 0=inbound
+  callStatus: number   // 0=answered, 3=unanswered
+  duration: number
+}
 
-async function yeastarSendSMS(
-  clientApiKey: string,
-  fromNumber: string,
-  toNumber: string,
-  content: string,
-): Promise<void> {
-  // Yeastar P-Series SMS API — POST /api/v1.0.0/sms/send
-  // Auth: token in X-Authorization header (API key)
-  const url = `${YEASTAR_API_BASE}/api/v1.0.0/sms/send`
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'X-Authorization': clientApiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ from: fromNumber, to: toNumber, message: content }),
-  })
-  if (!res.ok) {
-    throw new Error(`Yeastar SMS API ${res.status}: ${await res.text()}`)
+type SMSReceivedEvent = {
+  event: 'sms.received'
+  From: string   // caller E.164
+  To: string     // business E.164
+  Content: string
+}
+
+async function fetchClient(
+  db: ReturnType<typeof createAdminClient>,
+  businessNumber: string,
+): Promise<ClientFull | null> {
+  const { data } = await db
+    .from('clients')
+    .select(
+      'id,business_name,owner_name,owner_email,owner_notify_number,' +
+      'provider_phone_number,provider_phone_number_id,booking_link,' +
+      'subscription_status,grace_period_ends_at,provider_api_key,provider_metadata',
+    )
+    .eq('voip_provider', 'yeastar')
+    .eq('provider_phone_number', businessNumber)
+    .single()
+
+  if (!data) return null
+  return data as unknown as ClientFull
+}
+
+function makeSendSMS(client: ClientFull) {
+  return async (to: string, message: string) => {
+    await yeastar.sendSMS(
+      { apiKey: client.provider_api_key!, metadata: client.provider_metadata },
+      client.provider_phone_number ?? '',
+      client.provider_phone_number_id,
+      to,
+      message,
+    )
   }
 }
 
-function scoreIntent(
-  transcript: Array<{ direction: string; body: string }>,
-  triggers: string[],
-): 'high' | 'medium' | 'low' {
-  const inboundText = transcript
-    .filter((m) => m.direction === 'inbound')
-    .map((m) => m.body.toLowerCase())
-    .join(' ')
-  const lowTriggers = triggers.map((t) => t.toLowerCase())
-  if (lowTriggers.some((t) => inboundText.includes(t))) return 'high'
-  const msgs = transcript.filter((m) => m.direction === 'inbound')
-  const words = inboundText.split(/\s+/).filter(Boolean).length
-  const avgLen = msgs.length > 0
-    ? msgs.reduce((s, m) => s + m.body.length, 0) / msgs.length
-    : 0
-  if (words > 5 && avgLen > 8) return 'medium'
-  return 'low'
-}
-
-function fill(
-  template: string,
-  vars: { business_name?: string; owner_name?: string; booking_link?: string },
-): string {
-  return template
-    .replace(/\{business_name\}/g, vars.business_name ?? '')
-    .replace(/\{owner_name\}/g, vars.owner_name ?? '')
-    .replace(/\{booking_link\}/g, vars.booking_link ?? '')
-}
-
 export async function POST(req: Request) {
-  let body: YeastarCallEvent
+  let body: Record<string, unknown>
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ ok: true })
   }
 
-  // Only handle Event 30012 (Call End Details)
-  if (body.event !== 30012) {
-    return NextResponse.json({ ok: true })
-  }
-
-  // Only missed inbound calls (direction=0, status=3 unanswered, duration=0)
-  const isMissedInbound =
-    body.callDirection === 0 &&
-    (body.callStatus === 3 || body.duration === 0)
-
-  if (!isMissedInbound) {
-    return NextResponse.json({ ok: true })
-  }
-
-  const callerNumber = body.from
-  const businessNumber = body.to
-  if (!callerNumber || !businessNumber) {
-    return NextResponse.json({ ok: true })
-  }
-
   const db = createAdminClient()
+  const event = body.event
 
   try {
-    // Find the client by their VoIP phone number
-    const { data: clientData } = await db
-      .from('clients')
-      .select('id,business_name,owner_name,owner_notify_number,provider_phone_number,provider_api_key,booking_link,subscription_status,grace_period_ends_at')
-      .eq('voip_provider', 'yeastar')
-      .eq('provider_phone_number', businessNumber)
-      .single()
+    if (event === 30012) {
+      const call = body as unknown as CallEndEvent
 
-    if (!clientData) return NextResponse.json({ ok: true })
+      // Only missed inbound calls
+      if (call.callDirection !== 0) return NextResponse.json({ ok: true })
+      if (call.callStatus !== 3 && call.duration !== 0) return NextResponse.json({ ok: true })
+      if (!call.from || !call.to) return NextResponse.json({ ok: true })
 
-    // Subscription check — support grace period
-    if (clientData.subscription_status === 'cancelled') {
-      return NextResponse.json({ ok: true })
+      const client = await fetchClient(db, call.to)
+      if (!client?.provider_api_key) return NextResponse.json({ ok: true })
+      if (!isSubscriptionActive(client)) return NextResponse.json({ ok: true })
+
+      await handleMissedCall(db, client, call.from, makeSendSMS(client))
+    } else if (event === 'sms.received') {
+      const msg = body as unknown as SMSReceivedEvent
+      if (!msg.From || !msg.To) return NextResponse.json({ ok: true })
+
+      const client = await fetchClient(db, msg.To)
+      if (!client?.provider_api_key) return NextResponse.json({ ok: true })
+      if (!isSubscriptionActive(client)) return NextResponse.json({ ok: true })
+
+      await handleInboundSMS(db, client, msg.From, msg.Content, makeSendSMS(client))
     }
-    if (clientData.subscription_status === 'past_due') {
-      const graceEnds = clientData.grace_period_ends_at
-      if (!graceEnds || new Date(graceEnds) < new Date()) {
-        return NextResponse.json({ ok: true })
-      }
-    }
-
-    if (!clientData.provider_api_key) return NextResponse.json({ ok: true })
-
-    const { data: flowData } = await db
-      .from('flows')
-      .select('*')
-      .eq('client_id', clientData.id)
-      .single()
-
-    if (!flowData) return NextResponse.json({ ok: true })
-
-    // Deduplicate — skip if lead already in progress with this caller
-    const { data: existing } = await db
-      .from('leads')
-      .select('id')
-      .eq('client_id', clientData.id)
-      .eq('caller_number', callerNumber)
-      .eq('status', 'in_progress')
-      .maybeSingle()
-
-    if (existing) return NextResponse.json({ ok: true })
-
-    const { data: leadData } = await db
-      .from('leads')
-      .insert({
-        client_id: clientData.id,
-        caller_number: callerNumber,
-        status: 'in_progress',
-        current_question_index: -1,
-        transcript: [],
-      })
-      .select()
-      .single()
-
-    if (!leadData) return NextResponse.json({ ok: true })
-
-    const opening = fill(flowData.opening_message, {
-      business_name: clientData.business_name,
-      owner_name: clientData.owner_name,
-      booking_link: clientData.booking_link ?? '',
-    })
-
-    await yeastarSendSMS(
-      clientData.provider_api_key,
-      businessNumber,
-      callerNumber,
-      opening,
-    )
-
-    const entry = { direction: 'outbound', body: opening, sent_at: new Date().toISOString() }
-
-    await db.from('messages').insert({
-      lead_id: leadData.id,
-      client_id: clientData.id,
-      direction: 'outbound',
-      body: opening,
-    })
-
-    await db.from('leads').update({ transcript: [entry] }).eq('id', leadData.id)
   } catch (err) {
     await db.from('errors').insert({
-      context: 'yeastar_webhook',
+      context: `yeastar_webhook_${event}`,
       error_message: err instanceof Error ? err.message : String(err),
     })
   }

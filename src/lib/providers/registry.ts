@@ -16,11 +16,9 @@ import { eightx8 } from './eightx8'
 import { ringcentral } from './ringcentral'
 import { zoomphone } from './zoomphone'
 import { gotoconnect } from './gotoconnect'
-// import { dialpad } from './dialpad'
-// import { justcall } from './justcall'
-// import { kixie } from './kixie'
-// import { eightx8 } from './8x8'
-// import { zoom } from './zoom'
+import { yeastar } from './yeastar'
+import { nextiva } from './nextiva'
+import { cloudtalk } from './cloudtalk'
 
 const REGISTRY: Record<string, Provider> = {
   openphone,
@@ -32,12 +30,9 @@ const REGISTRY: Record<string, Provider> = {
   ringcentral,
   zoomphone,
   gotoconnect,
-  // aircall,
-  // dialpad,
-  // justcall,
-  // kixie,
-  // '8x8': eightx8,
-  // zoom_phone: zoom,
+  yeastar,
+  nextiva,
+  cloudtalk,
 }
 
 /**
