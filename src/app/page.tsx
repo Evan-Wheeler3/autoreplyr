@@ -576,15 +576,19 @@ const steps = [
 /* ─── Integrations Strip ─────────────────────────────────────────────────────── */
 
 const integrations = [
-  { name: 'Quo',          src: '/logos/quo-logo.png' },
-  { name: 'Twilio',       src: '/logos/twilio-logo-removebg-preview.png' },
-  { name: 'RingCentral',  src: '/logos/ringcentral-logo-removebg-preview.png' },
-  { name: 'Google Voice', src: '/logos/googlevoice-logo-removebg-preview.png' },
-  { name: 'Dialpad',      src: '/logos/dialpad-logo.png' },
-  { name: 'Grasshopper',  src: '/logos/grasshopper-logo-removebg-preview.png' },
-  { name: 'Vonage',       src: '/logos/vonage-logo-removebg-preview.png' },
-  { name: 'Nextiva',      src: '/logos/nextiva-logo-removebg-preview.png' },
-  { name: 'Ooma',         src: '/logos/ooma-logo-removebg-preview.png' },
+  { name: 'Quo',           src: '/logos/quo-logo.png' },
+  { name: 'RingCentral',   src: '/logos/ringcentral-logo-removebg-preview.png' },
+  { name: 'Dialpad',       src: '/logos/dialpad-logo.png' },
+  { name: 'Nextiva',       src: '/logos/nextiva-logo-removebg-preview.png' },
+  { name: 'Yeastar',       src: '/logos/Yeastar-logo-removebg-preview.png' },
+  { name: 'Aircall',       src: '/logos/aircall-logo.png' },
+  { name: 'Zoom Phone',    src: '/logos/zoomphone-logo.jpg' },
+  { name: 'GoTo Connect',  src: '/logos/gotoconnect-logo-removebg-preview.png' },
+  { name: '8x8',           src: '/logos/8x8-logo-removebg-preview.png' },
+  { name: 'JustCall',      src: '/logos/justcall-logo-removebg-preview.png' },
+  { name: 'Kixie',         src: '/logos/Kixie-logo-removebg-preview.png' },
+  { name: 'CloudTalk',     src: '/logos/cloudtalk-logo.png' },
+  { name: 'Microsoft Teams', src: '/logos/microsoft-logo-removebg-preview (1).png' },
 ]
 
 function IntegrationsStrip() {
