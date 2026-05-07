@@ -12,6 +12,7 @@ import { aircall } from './aircall'
 import { dialpad } from './dialpad'
 import { justcall } from './justcall'
 import { kixie } from './kixie'
+import { eightx8 } from './eightx8'
 // Future providers are added here as they are built:
 // import { ringcentral } from './ringcentral'
 // import { dialpad } from './dialpad'
@@ -26,6 +27,7 @@ const REGISTRY: Record<string, Provider> = {
   dialpad,
   justcall,
   kixie,
+  '8x8': eightx8,
   // ringcentral,
   // aircall,
   // dialpad,
