@@ -1,6 +1,190 @@
 import { Resend } from 'resend'
 import type { Lead } from '@/types'
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://autoreplyr.com'
+
+const PROVIDER_SETUP: Record<string, { label: string; steps: string[]; docsUrl: string }> = {
+  yeastar: {
+    label: 'Yeastar / 4-Voice',
+    docsUrl: 'https://help.yeastar.com/en/p-series-cloud-edition/event-list/30012-call-end-details.html',
+    steps: [
+      'Log into your Yeastar / 4-Voice admin portal.',
+      'Navigate to <strong>Settings → Integration → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/yeastar</code>`,
+      'Subscribe to event <strong>30012 (Call End Details)</strong>.',
+      'Save and enable the webhook.',
+      'Ensure outbound SMS is enabled for your phone number in the Yeastar SMS settings.',
+    ],
+  },
+  openphone: {
+    label: 'OpenPhone / Quo',
+    docsUrl: 'https://www.openphone.com/docs/api-reference',
+    steps: [
+      'Log into your OpenPhone web app at app.openphone.com.',
+      'Go to <strong>Settings → Integrations → API</strong>.',
+      'Create an API key with <strong>read + write</strong> access.',
+      'Go to <strong>Settings → Integrations → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/openphone</code>`,
+      'Subscribe to <strong>call.completed</strong> and <strong>message.received</strong> events.',
+    ],
+  },
+  ringcentral: {
+    label: 'RingCentral',
+    docsUrl: 'https://developers.ringcentral.com/guide/notifications/webhooks',
+    steps: [
+      'A member of the AutoReplyr team will configure your RingCentral integration within 24 hours.',
+      'You will receive a follow-up email with next steps.',
+    ],
+  },
+  aircall: {
+    label: 'Aircall',
+    docsUrl: 'https://developer.aircall.io/api-references/webhooks',
+    steps: [
+      'Log into your Aircall Dashboard at dashboard.aircall.io.',
+      'Go to <strong>Integrations → API Keys</strong> and create a key.',
+      'Go to <strong>Integrations → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/aircall</code>`,
+      'Subscribe to the <strong>call.ended</strong> event.',
+    ],
+  },
+  dialpad: {
+    label: 'Dialpad',
+    docsUrl: 'https://developers.dialpad.com/reference/webhooks',
+    steps: [
+      'Log into Dialpad at dialpad.com.',
+      'Go to <strong>Admin → Integrations → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/dialpad</code>`,
+      'Subscribe to the <strong>Inbound Hangup</strong> event.',
+    ],
+  },
+  zoom_phone: {
+    label: 'Zoom Phone',
+    docsUrl: 'https://developers.zoom.us/docs/api/phone/',
+    steps: [
+      'A member of the AutoReplyr team will configure your Zoom Phone integration within 24 hours.',
+      'You will receive a follow-up email with next steps.',
+    ],
+  },
+  goto_connect: {
+    label: 'GoTo Connect',
+    docsUrl: 'https://developer.goto.com/GoToConnect/',
+    steps: [
+      'A member of the AutoReplyr team will configure your GoTo Connect integration within 24 hours.',
+      'You will receive a follow-up email with next steps.',
+    ],
+  },
+  '8x8': {
+    label: '8x8',
+    docsUrl: 'https://developer.8x8.com/',
+    steps: [
+      'Log into your 8x8 Admin Console.',
+      'Go to <strong>Settings → API & Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/8x8</code>`,
+      'Subscribe to missed call alerts.',
+    ],
+  },
+  nextiva: {
+    label: 'Nextiva',
+    docsUrl: 'https://developer.nextiva.com/',
+    steps: [
+      'Log into your Nextiva admin portal.',
+      'Go to <strong>Settings → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/nextiva</code>`,
+      'Subscribe to <strong>New Missed Call</strong> events.',
+    ],
+  },
+  justcall: {
+    label: 'JustCall',
+    docsUrl: 'https://developers.justcall.io/docs/webhooks',
+    steps: [
+      'Log into JustCall at app.justcall.io.',
+      'Go to <strong>Settings → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/justcall</code>`,
+      'Subscribe to the <strong>Missed Call</strong> webhook event.',
+    ],
+  },
+  kixie: {
+    label: 'Kixie',
+    docsUrl: 'https://help.kixie.com/en/articles/webhooks',
+    steps: [
+      'Log into Kixie at app.kixie.com.',
+      'Go to <strong>Settings → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/kixie</code>`,
+      'Subscribe to the <strong>endcall</strong> event.',
+    ],
+  },
+  cloudtalk: {
+    label: 'CloudTalk',
+    docsUrl: 'https://support.cloudtalk.io/hc/en-us/articles/webhooks',
+    steps: [
+      'Log into CloudTalk at app.cloudtalk.io.',
+      'Go to <strong>Settings → Webhooks</strong>.',
+      `Add this webhook URL: <code>${APP_URL}/api/webhooks/cloudtalk</code>`,
+      'Subscribe to the <strong>call.missed</strong> event.',
+    ],
+  },
+  microsoft_teams: {
+    label: 'Microsoft Teams Phone',
+    docsUrl: 'https://learn.microsoft.com/en-us/microsoftteams/phone-system-overview',
+    steps: [
+      'A member of the AutoReplyr team will configure your Teams Phone integration within 24 hours.',
+      'You will receive a follow-up email with next steps.',
+    ],
+  },
+}
+
+export async function sendSetupEmail({
+  toEmail,
+  ownerName,
+  businessName,
+  voipProvider,
+  providerPhoneNumber,
+}: {
+  toEmail: string
+  ownerName: string
+  businessName: string
+  voipProvider: string | null
+  providerPhoneNumber: string | null
+}) {
+  const resend = getResend()
+  const providerInfo = voipProvider ? PROVIDER_SETUP[voipProvider] : null
+  const loginUrl = `${APP_URL}/login`
+
+  const setupHtml = providerInfo
+    ? `
+      <h3>Setup steps for ${providerInfo.label}</h3>
+      <ol style="font-size:14px;line-height:1.8;">
+        ${providerInfo.steps.map((s) => `<li>${s}</li>`).join('')}
+      </ol>
+      <p style="font-size:13px;color:#666;">
+        <a href="${providerInfo.docsUrl}">Official ${providerInfo.label} documentation →</a>
+      </p>
+    `
+    : `<p>Our team will reach out with setup instructions for your phone system.</p>`
+
+  await resend.emails.send({
+    from: 'AutoReplyr <hello@autoreplyr.com>',
+    to: toEmail,
+    subject: `Your AutoReplyr account is ready — complete your setup`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; color: #111;">
+        <h2 style="color: #1B2A4A;">Hi ${ownerName},</h2>
+        <p>Your AutoReplyr account for <strong>${businessName}</strong> is active. Complete the 5-minute setup below and you'll start capturing missed calls automatically.</p>
+        ${providerPhoneNumber ? `<p><strong>Your business number:</strong> ${providerPhoneNumber}</p>` : ''}
+        ${setupHtml}
+        <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+        <p>Once setup is complete, any missed call to your number will trigger an automated SMS conversation — and qualified leads will appear in your dashboard.</p>
+        <p>
+          <a href="${loginUrl}" style="background:#1B2A4A;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block;margin-top:8px;">View your dashboard →</a>
+        </p>
+        <p style="color:#666;font-size:13px;margin-top:32px;">
+          Questions? Reply to this email or contact <a href="mailto:evan@velza.com">evan@velza.com</a>.
+        </p>
+      </div>
+    `,
+  })
+}
+
 function getResend() {
   const key = process.env.RESEND_API_KEY
   if (!key) throw new Error('Missing RESEND_API_KEY')

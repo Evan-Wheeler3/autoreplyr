@@ -10,4 +10,8 @@ export const env = {
   supabaseServiceRoleKey: () => requireEnv('SUPABASE_SERVICE_ROLE_KEY'),
   resendApiKey: () => requireEnv('RESEND_API_KEY'),
   adminEmail: () => requireEnv('ADMIN_EMAIL'),
+  stripeSecretKey: () => requireEnv('STRIPE_SECRET_KEY'),
+  stripeWebhookSecret: () => requireEnv('STRIPE_WEBHOOK_SECRET'),
+  stripePriceId: () => requireEnv('STRIPE_PRICE_ID'),
+  appUrl: () => process.env.NEXT_PUBLIC_APP_URL ?? 'https://autoreplyr.com',
 }

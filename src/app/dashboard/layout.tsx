@@ -30,6 +30,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <nav className="flex-1 px-3 py-4 space-y-1">
           <NavLink href="/dashboard">Overview</NavLink>
           <NavLink href="/dashboard/leads">All Leads</NavLink>
+          <NavLink href="/dashboard/flow">SMS Flow</NavLink>
+          <NavLink href="/dashboard/settings">Settings</NavLink>
         </nav>
 
         <div className="px-3 py-4 border-t border-gray-700">
