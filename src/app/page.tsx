@@ -398,9 +398,9 @@ function Hero() {
             </div>
           </div>
 
-          {/* Right — Phone */}
+          {/* Right — Phone (hidden on mobile) */}
           <div
-            className="flex justify-center lg:justify-end items-center"
+            className="hidden lg:flex justify-center lg:justify-end items-center"
             style={{
               opacity: mounted ? 1 : 0,
               transform: mounted
