@@ -11,6 +11,7 @@ import { openphone } from './openphone'
 import { aircall } from './aircall'
 import { dialpad } from './dialpad'
 import { justcall } from './justcall'
+import { kixie } from './kixie'
 // Future providers are added here as they are built:
 // import { ringcentral } from './ringcentral'
 // import { dialpad } from './dialpad'
@@ -24,6 +25,7 @@ const REGISTRY: Record<string, Provider> = {
   aircall,
   dialpad,
   justcall,
+  kixie,
   // ringcentral,
   // aircall,
   // dialpad,
