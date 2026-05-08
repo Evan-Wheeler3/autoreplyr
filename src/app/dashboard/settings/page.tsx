@@ -18,7 +18,7 @@ export default async function SettingsPage() {
 
   const { data: client } = await db
     .from('clients')
-    .select('id,business_name,owner_name,owner_email,owner_notify_number,industry,booking_link,voip_provider,provider_phone_number,subscription_status')
+    .select('id,business_name,owner_name,owner_email,owner_notify_number,industry,booking_link,voip_provider,provider_phone_number,subscription_status,oauth_access_token')
     .eq('id', clientUser.client_id)
     .single()
 
