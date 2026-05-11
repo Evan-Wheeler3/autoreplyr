@@ -32,8 +32,9 @@ const PROVIDER_SETUP: Record<string, { label: string; steps: string[]; docsUrl: 
     label: 'RingCentral',
     docsUrl: 'https://developers.ringcentral.com/guide/notifications/webhooks',
     steps: [
-      'A member of the AutoReplyr team will configure your RingCentral integration within 24 hours.',
-      'You will receive a follow-up email with next steps.',
+      'Go to your dashboard and click <strong>Connect RingCentral</strong> in the Phone System section.',
+      'You will be redirected to RingCentral to authorize AutoReplyr.',
+      'Once connected, AutoReplyr will start capturing missed calls automatically.',
     ],
   },
   aircall: {
@@ -57,20 +58,22 @@ const PROVIDER_SETUP: Record<string, { label: string; steps: string[]; docsUrl: 
       'Subscribe to the <strong>Inbound Hangup</strong> event.',
     ],
   },
-  zoom_phone: {
+  zoomphone: {
     label: 'Zoom Phone',
     docsUrl: 'https://developers.zoom.us/docs/api/phone/',
     steps: [
-      'A member of the AutoReplyr team will configure your Zoom Phone integration within 24 hours.',
-      'You will receive a follow-up email with next steps.',
+      'Go to your dashboard and click <strong>Connect Zoom Phone</strong> in the Phone System section.',
+      'You will be redirected to Zoom to authorize AutoReplyr.',
+      'Once connected, AutoReplyr will start capturing missed calls automatically.',
     ],
   },
-  goto_connect: {
+  gotoconnect: {
     label: 'GoTo Connect',
     docsUrl: 'https://developer.goto.com/GoToConnect/',
     steps: [
-      'A member of the AutoReplyr team will configure your GoTo Connect integration within 24 hours.',
-      'You will receive a follow-up email with next steps.',
+      'Go to your dashboard and click <strong>Connect GoTo Connect</strong> in the Phone System section.',
+      'You will be redirected to GoTo to authorize AutoReplyr.',
+      'Once connected, AutoReplyr will start capturing missed calls automatically.',
     ],
   },
   '8x8': {

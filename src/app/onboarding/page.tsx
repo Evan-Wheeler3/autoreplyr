@@ -18,6 +18,7 @@ interface ProviderOption {
   authType: 'api_key' | 'oauth' | 'webhook_url'
   apiKeyLabel?: string
   apiKeyPlaceholder?: string
+  apiKeyHelp?: string
   oauthComingSoon?: boolean
   webhookNote?: string
 }
@@ -29,6 +30,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'OpenPhone API Key',
     apiKeyPlaceholder: 'op_live_...',
+    apiKeyHelp: 'Find this in OpenPhone → Settings → Integrations → API.',
   },
   {
     value: 'yeastar',
@@ -36,6 +38,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'Yeastar API Token',
     apiKeyPlaceholder: 'Paste your Yeastar API token',
+    apiKeyHelp: 'Find this in your Yeastar / 4-Voice admin panel under System → Open API. Contact your 4-Voice account manager if you don\'t see it.',
   },
   {
     value: 'aircall',
@@ -43,6 +46,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'Aircall API Key',
     apiKeyPlaceholder: 'Paste your Aircall API key',
+    apiKeyHelp: 'Find this in Aircall Dashboard → Integrations → API Keys.',
   },
   {
     value: 'dialpad',
@@ -50,6 +54,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'Dialpad API Key',
     apiKeyPlaceholder: 'Paste your Dialpad API key',
+    apiKeyHelp: 'Find this in Dialpad → Admin → Integrations → API.',
   },
   {
     value: 'nextiva',
@@ -57,6 +62,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'Nextiva API Key',
     apiKeyPlaceholder: 'Paste your Nextiva API key',
+    apiKeyHelp: 'Find this in your Nextiva admin portal under Settings → API Access.',
   },
   {
     value: 'justcall',
@@ -64,6 +70,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'JustCall API Key',
     apiKeyPlaceholder: 'Paste your JustCall API key',
+    apiKeyHelp: 'Find this in JustCall → Settings → Developers → API Keys.',
   },
   {
     value: 'kixie',
@@ -71,6 +78,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'Kixie API Key',
     apiKeyPlaceholder: 'Paste your Kixie API key',
+    apiKeyHelp: 'Find this in Kixie → Settings → Integrations → API.',
   },
   {
     value: 'cloudtalk',
@@ -78,6 +86,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: 'CloudTalk API Key',
     apiKeyPlaceholder: 'Paste your CloudTalk API key',
+    apiKeyHelp: 'Find this in CloudTalk → Settings → Integrations → API Keys.',
   },
   {
     value: '8x8',
@@ -85,6 +94,7 @@ const PROVIDERS: ProviderOption[] = [
     authType: 'api_key',
     apiKeyLabel: '8x8 API Key',
     apiKeyPlaceholder: 'Paste your 8x8 API key',
+    apiKeyHelp: 'Find this in your 8x8 Admin Console under Settings → API & Webhooks.',
   },
   {
     value: 'ringcentral',
@@ -378,6 +388,9 @@ function Step2({
             </div>
             {lookupError && (
               <p className="text-xs text-red-600 mt-1">{lookupError}</p>
+            )}
+            {selected.apiKeyHelp && (
+              <p className="text-xs text-gray-400 mt-1">{selected.apiKeyHelp}</p>
             )}
           </div>
 
