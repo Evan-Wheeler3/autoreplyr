@@ -612,7 +612,7 @@ function IntegrationsStrip() {
         <div style={{
           display: 'flex',
           width: 'max-content',
-          animation: 'marquee 22s linear infinite',
+          animation: 'marquee 44s linear infinite',
         }}>
           {items.map((int, i) => (
             <div key={i} className="flex items-center gap-3 mx-10">
