@@ -42,6 +42,8 @@ export async function POST(req: Request) {
       await handleSubscriptionUpdated(event.data.object as Stripe.Subscription, db)
     } else if (event.type === 'customer.subscription.deleted') {
       await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, db)
+    } else if (event.type === 'customer.subscription.paused') {
+      await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, db)
     } else if (event.type === 'invoice.payment_failed') {
       await handlePaymentFailed(event.data.object as Stripe.Invoice, db)
     } else if (event.type === 'invoice.payment_succeeded') {
