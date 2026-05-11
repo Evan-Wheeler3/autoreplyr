@@ -140,7 +140,7 @@ function PhoneSystemSection({ client }: { client: ClientData }) {
       )}
 
       <p className="text-xs text-gray-400">
-        To change your phone system, contact <a href="mailto:evan@velza.com" className="underline">evan@velza.com</a>.
+        To change your phone system, contact support.
       </p>
     </div>
   )
@@ -193,7 +193,7 @@ export function SettingsForm({ client }: { client: ClientData }) {
           </div>
           {client.subscription_status !== 'active' && (
             <a
-              href="mailto:evan@velza.com?subject=AutoReplyr billing"
+              href="https://autoreplyr.com"
               className="text-sm text-blue-600 underline"
             >
               Contact support

@@ -181,7 +181,7 @@ export async function sendSetupEmail({
           <a href="${loginUrl}" style="background:#1B2A4A;color:white;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block;margin-top:8px;">View your dashboard →</a>
         </p>
         <p style="color:#666;font-size:13px;margin-top:32px;">
-          Questions? Reply to this email or contact <a href="mailto:evan@velza.com">evan@velza.com</a>.
+          Questions? Reply to this email or visit <a href="https://autoreplyr.com">autoreplyr.com</a>.
         </p>
       </div>
     `,

@@ -357,8 +357,7 @@ function Step2({
           ))}
         </div>
         <p className="text-xs text-gray-400 mt-2">
-          Don&apos;t see your provider?{' '}
-          <a href="mailto:evan@velza.com" className="underline">Email us</a>
+          Don&apos;t see your provider? Contact support at autoreplyr.com
         </p>
       </div>
 

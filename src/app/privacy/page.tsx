@@ -77,11 +77,11 @@ export default function PrivacyPage() {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 md:p-12">
 
             <p className="text-slate-600 text-sm leading-relaxed mb-10">
-              This Privacy Policy describes how Velza LLC ("we", "us", "our") collects, uses, and protects information in connection with the AutoReplyr service ("Service"). By using the Service you agree to the practices described in this policy.
+              This Privacy Policy describes how AutoReplyr ("we", "us", "our") collects, uses, and protects information in connection with the AutoReplyr service ("Service"). By using the Service you agree to the practices described in this policy.
             </p>
 
             <Section title="1. Who We Are">
-              <p>AutoReplyr is an automated SMS follow-up platform for local service businesses, operated by Velza LLC. Our website is <a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a>. If you have questions about this policy, contact us at <a href="mailto:evan@velza.com" className="text-[#1B2A4A] underline">evan@velza.com</a>.</p>
+              <p>AutoReplyr is an automated SMS follow-up platform for local service businesses. Our website is <a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a>. Questions about this policy can be submitted through our website.</p>
             </Section>
 
             <Section title="2. Information We Collect">
@@ -143,7 +143,7 @@ export default function PrivacyPage() {
 
             <Section title="7. Data Security">
               <p>We implement industry-standard security measures including encrypted data storage, HTTPS-only transmission, and access controls. API credentials are stored encrypted. However, no system is completely secure and we cannot guarantee absolute security.</p>
-              <p>If you believe your account has been compromised, contact us immediately at <a href="mailto:evan@velza.com" className="text-[#1B2A4A] underline">evan@velza.com</a>.</p>
+              <p>If you believe your account has been compromised, contact us immediately through <a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a>.</p>
             </Section>
 
             <Section title="8. Your Rights">
@@ -155,7 +155,7 @@ export default function PrivacyPage() {
                 <li><strong className="text-slate-800">Portability:</strong> Request your data in a machine-readable format</li>
                 <li><strong className="text-slate-800">Opt-out of SMS:</strong> Callers may reply STOP at any time</li>
               </ul>
-              <p>To exercise any of these rights, contact <a href="mailto:evan@velza.com" className="text-[#1B2A4A] underline">evan@velza.com</a>. We will respond within 30 days.</p>
+              <p>To exercise any of these rights, contact us through <a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a>. We will respond within 30 days.</p>
             </Section>
 
             <Section title="9. Children's Privacy">
@@ -171,12 +171,7 @@ export default function PrivacyPage() {
             </Section>
 
             <Section title="12. Contact">
-              <p>Questions, concerns, or requests regarding this Privacy Policy:</p>
-              <div className="bg-gray-50 rounded-xl p-4 mt-2">
-                <p className="font-medium text-[#1B2A4A]">Velza LLC / AutoReplyr</p>
-                <p><a href="mailto:evan@velza.com" className="text-[#1B2A4A] underline">evan@velza.com</a></p>
-                <p><a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a></p>
-              </div>
+              <p>Questions, concerns, or requests regarding this Privacy Policy can be submitted through <a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a>.</p>
             </Section>
 
           </div>

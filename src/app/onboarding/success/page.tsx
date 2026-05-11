@@ -19,7 +19,7 @@ export default function OnboardingSuccessPage() {
           Go to your dashboard →
         </Link>
         <p className="text-sm text-gray-400 mt-6">
-          Questions? Email <a href="mailto:evan@velza.com" className="underline">evan@velza.com</a>
+          Questions? Visit <a href="https://autoreplyr.com" className="underline">autoreplyr.com</a>
         </p>
       </div>
     </div>

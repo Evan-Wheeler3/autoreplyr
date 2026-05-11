@@ -77,7 +77,7 @@ export default function TermsPage() {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 md:p-12">
 
             <p className="text-slate-600 text-sm leading-relaxed mb-10">
-              These Terms of Service ("Terms") govern your use of AutoReplyr ("Service"), operated by Velza LLC ("we", "us", "our"). By signing up for or using AutoReplyr, you agree to be bound by these Terms. Please read them carefully.
+              These Terms of Service ("Terms") govern your use of AutoReplyr ("Service", "we", "us", "our"). By signing up for or using AutoReplyr, you agree to be bound by these Terms. Please read them carefully.
             </p>
 
             <Section title="1. Service Description">
@@ -90,7 +90,7 @@ export default function TermsPage() {
             </Section>
 
             <Section title="3. Account Registration">
-              <p>You are responsible for maintaining the confidentiality of your account credentials. You agree to notify us immediately at <a href="mailto:evan@velza.com" className="text-[#1B2A4A] underline">evan@velza.com</a> if you suspect unauthorized access to your account. We are not liable for any loss arising from unauthorized use of your account.</p>
+              <p>You are responsible for maintaining the confidentiality of your account credentials. You agree to notify us immediately via autoreplyr.com if you suspect unauthorized access to your account. We are not liable for any loss arising from unauthorized use of your account.</p>
             </Section>
 
             <Section title="4. SMS Messaging & TCPA Compliance">
@@ -123,7 +123,7 @@ export default function TermsPage() {
             </Section>
 
             <Section title="7. Cancellation">
-              <p>You may cancel your subscription at any time from your dashboard or by contacting <a href="mailto:evan@velza.com" className="text-[#1B2A4A] underline">evan@velza.com</a>. Cancellation takes effect at the end of the current billing period. You will continue to have access to the Service until that date.</p>
+              <p>You may cancel your subscription at any time from your dashboard. Cancellation takes effect at the end of the current billing period. You will continue to have access to the Service until that date.</p>
               <p>We reserve the right to suspend or terminate your account immediately if you violate these Terms.</p>
             </Section>
 
@@ -132,7 +132,7 @@ export default function TermsPage() {
             </Section>
 
             <Section title="9. Intellectual Property">
-              <p>The AutoReplyr platform, including its software, design, trademarks, and content, is owned by Velza LLC and protected by applicable intellectual property laws. You are granted a limited, non-exclusive, non-transferable license to use the Service solely for your internal business purposes during your subscription period.</p>
+              <p>The AutoReplyr platform, including its software, design, trademarks, and content, is owned by AutoReplyr and protected by applicable intellectual property laws. You are granted a limited, non-exclusive, non-transferable license to use the Service solely for your internal business purposes during your subscription period.</p>
             </Section>
 
             <Section title="10. Third-Party Integrations">
@@ -145,12 +145,12 @@ export default function TermsPage() {
             </Section>
 
             <Section title="12. Limitation of Liability">
-              <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, VELZA LLC SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING FROM YOUR USE OF THE SERVICE.</p>
+              <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, AUTOREPLYR SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING FROM YOUR USE OF THE SERVICE.</p>
               <p>OUR TOTAL LIABILITY TO YOU FOR ANY CLAIMS ARISING UNDER THESE TERMS SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE THREE MONTHS PRECEDING THE CLAIM.</p>
             </Section>
 
             <Section title="13. Indemnification">
-              <p>You agree to indemnify, defend, and hold harmless Velza LLC and its officers, directors, employees, and agents from any claims, liabilities, damages, losses, and expenses (including reasonable legal fees) arising from your use of the Service, your violation of these Terms, or your violation of any applicable law or third-party rights.</p>
+              <p>You agree to indemnify, defend, and hold harmless AutoReplyr and its operators, employees, and agents from any claims, liabilities, damages, losses, and expenses (including reasonable legal fees) arising from your use of the Service, your violation of these Terms, or your violation of any applicable law or third-party rights.</p>
             </Section>
 
             <Section title="14. Modifications to Terms">
@@ -162,12 +162,7 @@ export default function TermsPage() {
             </Section>
 
             <Section title="16. Contact">
-              <p>Questions about these Terms? Contact us at:</p>
-              <div className="bg-gray-50 rounded-xl p-4 mt-2">
-                <p className="font-medium text-[#1B2A4A]">Velza LLC / AutoReplyr</p>
-                <p><a href="mailto:evan@velza.com" className="text-[#1B2A4A] underline">evan@velza.com</a></p>
-                <p><a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a></p>
-              </div>
+              <p>Questions about these Terms? Contact us through <a href="https://autoreplyr.com" className="text-[#1B2A4A] underline">autoreplyr.com</a>.</p>
             </Section>
 
           </div>
