@@ -18,6 +18,7 @@ export interface OnboardingPayload {
   providerApiKey?: string        // for API-key providers
   providerPhoneNumber: string    // E.164 display number
   providerPhoneNumberId?: string // provider-specific ID (e.g. OpenPhone phoneNumberId)
+  providerPbxDomain?: string     // Yeastar only
 
   // Step 3
   openingMessage: string
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
     providerApiKey,
     providerPhoneNumber,
     providerPhoneNumberId,
+    providerPbxDomain,
     openingMessage,
   } = payload
 
@@ -113,6 +115,7 @@ export async function POST(req: Request) {
         provider_api_key: providerApiKey || null,
         provider_phone_number: providerPhoneNumber,
         provider_phone_number_id: providerPhoneNumberId || null,
+        provider_metadata: providerPbxDomain ? { pbx_domain: providerPbxDomain } : {},
         stripe_customer_id: customer.id,
         subscription_status: 'cancelled',
         status: 'active',

@@ -93,13 +93,13 @@ const PROVIDERS: ProviderOption[] = [
     oauthComingSoon: false,
   },
   {
-    value: 'zoom_phone',
+    value: 'zoomphone',
     label: 'Zoom Phone',
     authType: 'oauth',
     oauthComingSoon: true,
   },
   {
-    value: 'goto_connect',
+    value: 'gotoconnect',
     label: 'GoTo Connect',
     authType: 'oauth',
     oauthComingSoon: true,
@@ -127,6 +127,7 @@ interface FormState {
   providerApiKey: string
   providerPhoneNumber: string
   providerPhoneNumberId: string // OpenPhone phoneNumberId; empty for E.164 providers
+  providerPbxDomain: string    // Yeastar only
   openingMessage: string
 }
 
@@ -306,7 +307,8 @@ function Step2({
   const canContinue =
     !!form.voipProvider &&
     !selected?.oauthComingSoon &&
-    (needsLookup ? !!form.providerPhoneNumberId : !!form.providerPhoneNumber)
+    (needsLookup ? !!form.providerPhoneNumberId : !!form.providerPhoneNumber) &&
+    (form.voipProvider === 'yeastar' ? !!form.providerPbxDomain : true)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -324,6 +326,7 @@ function Step2({
                   providerApiKey: '',
                   providerPhoneNumber: '',
                   providerPhoneNumberId: '',
+                  providerPbxDomain: '',
                 }))
                 setNumbers([])
                 setLookupError('')
@@ -403,6 +406,22 @@ function Step2({
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Yeastar PBX domain */}
+          {selected.value === 'yeastar' && (
+            <div>
+              <Label>PBX domain</Label>
+              <Input
+                value={form.providerPbxDomain}
+                onChange={set('providerPbxDomain')}
+                placeholder="pbx.4voice.com"
+                required
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                The URL of your Yeastar / 4-Voice admin panel (without https://).
+              </p>
             </div>
           )}
 
@@ -541,6 +560,7 @@ function Step4({
       providerApiKey: form.providerApiKey || undefined,
       providerPhoneNumber: form.providerPhoneNumber,
       providerPhoneNumberId: form.providerPhoneNumberId || undefined,
+      providerPbxDomain: form.providerPbxDomain || undefined,
       openingMessage: form.openingMessage,
     }
 
@@ -642,6 +662,7 @@ export default function OnboardingPage() {
     providerApiKey: '',
     providerPhoneNumber: '',
     providerPhoneNumberId: '',
+    providerPbxDomain: '',
     openingMessage: DEFAULT_OPENING,
   })
 
