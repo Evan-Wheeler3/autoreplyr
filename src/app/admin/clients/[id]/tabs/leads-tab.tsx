@@ -48,8 +48,7 @@ export function LeadsTab({ leads }: { leads: Lead[] }) {
 
       {selected && (
         <TranscriptModal
-          callerNumber={selected.caller_number}
-          transcript={selected.transcript ?? []}
+          lead={selected}
           onClose={() => setSelected(null)}
         />
       )}
