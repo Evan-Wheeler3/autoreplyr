@@ -1,12 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import type { Lead } from '@/types'
+import type { Lead, LeadStatus } from '@/types'
 import { statusBadge, intentBadge } from '@/components/ui/badge'
 import { TranscriptModal } from '@/components/ui/transcript-modal'
 
-export function DashboardLeadsTable({ leads }: { leads: Lead[] }) {
+export function DashboardLeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
+  const [leads, setLeads] = useState<Lead[]>(initialLeads)
   const [selected, setSelected] = useState<Lead | null>(null)
+
+  function handleUpdate(id: string, updates: { status: LeadStatus; notes: string }) {
+    setLeads((prev) =>
+      prev.map((l) => l.id === id ? { ...l, ...updates } : l)
+    )
+    setSelected((prev) => prev?.id === id ? { ...prev, ...updates } : prev)
+  }
 
   return (
     <>
@@ -17,6 +25,7 @@ export function DashboardLeadsTable({ leads }: { leads: Lead[] }) {
             <th className="text-left px-5 py-3 text-gray-500 font-medium">Date</th>
             <th className="text-left px-5 py-3 text-gray-500 font-medium">Status</th>
             <th className="text-left px-5 py-3 text-gray-500 font-medium">Intent</th>
+            <th className="text-left px-5 py-3 text-gray-500 font-medium">Notes</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -32,11 +41,14 @@ export function DashboardLeadsTable({ leads }: { leads: Lead[] }) {
               </td>
               <td className="px-5 py-3">{statusBadge(lead.status)}</td>
               <td className="px-5 py-3">{intentBadge(lead.intent_level)}</td>
+              <td className="px-5 py-3 text-gray-400 max-w-[180px] truncate text-xs">
+                {lead.notes ?? '—'}
+              </td>
             </tr>
           ))}
           {leads.length === 0 && (
             <tr>
-              <td colSpan={4} className="px-5 py-8 text-center text-gray-400">
+              <td colSpan={5} className="px-5 py-8 text-center text-gray-400">
                 No leads yet. Your SMS system is live and waiting for missed calls.
               </td>
             </tr>
@@ -46,9 +58,9 @@ export function DashboardLeadsTable({ leads }: { leads: Lead[] }) {
 
       {selected && (
         <TranscriptModal
-          callerNumber={selected.caller_number}
-          transcript={selected.transcript ?? []}
+          lead={selected}
           onClose={() => setSelected(null)}
+          onUpdate={handleUpdate}
         />
       )}
     </>

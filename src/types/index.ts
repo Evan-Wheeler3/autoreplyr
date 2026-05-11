@@ -53,6 +53,7 @@ export interface Lead {
   intent_level: IntentLevel | null
   current_question_index: number
   transcript: TranscriptEntry[]
+  notes: string | null
 }
 
 export interface Message {
