@@ -627,7 +627,7 @@ function Step4({
           <span className="font-semibold">{form.billingInterval === 'yearly' ? '$490 / yr' : '$49 / mo'}</span>
         </div>
         <div className="text-xs text-gray-400 border-t pt-3">
-          Cancel anytime. No setup fee. Billing starts today.
+          7-day free trial. Cancel anytime. No setup fee. Card required — you won&apos;t be charged until day 8.
         </div>
       </div>
 

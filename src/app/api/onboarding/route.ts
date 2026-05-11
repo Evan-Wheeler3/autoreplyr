@@ -158,6 +158,7 @@ export async function POST(req: Request) {
       cancel_url: `${appUrl}/onboarding?cancelled=1`,
       subscription_data: {
         metadata: { client_id: clientData.id },
+        trial_period_days: 7,
       },
       allow_promotion_codes: true,
     })
