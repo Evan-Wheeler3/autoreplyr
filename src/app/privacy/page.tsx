@@ -5,22 +5,47 @@ export const metadata = { title: 'Privacy Policy — AutoReplyr' }
 
 function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 transition-all duration-500"
+      style={{ background: 'rgba(255,255,255,0.88)', backdropFilter: 'saturate(180%) blur(20px)', boxShadow: '0 1px 0 rgba(0,0,0,0.07)' }}
+    >
       <Link href="/" className="flex items-center gap-2.5 no-underline">
         <Image src="/logo-removebg-preview.png" alt="AutoReplyr" width={32} height={32} className="object-contain" />
         <span className="font-bold text-lg tracking-tight" style={{ color: '#1B2A4A' }}>AutoReplyr</span>
       </Link>
-      <div className="flex items-center gap-4">
-        <Link href="/terms" className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">Terms of Service</Link>
+      <div className="flex items-center gap-3 sm:gap-6">
+        <div className="hidden sm:flex items-center gap-6">
+          <Link href="/#how-it-works" className="text-sm font-medium transition-colors duration-200" style={{ color: '#475569', textDecoration: 'none' }}>How it Works</Link>
+          <Link href="/#use-cases" className="text-sm font-medium transition-colors duration-200" style={{ color: '#475569', textDecoration: 'none' }}>Use Cases</Link>
+          <Link href="/demo" className="text-sm font-medium transition-colors duration-200" style={{ color: '#475569', textDecoration: 'none' }}>Demo</Link>
+        </div>
         <Link
-          href="/onboarding"
-          className="text-sm font-bold px-4 py-2 rounded-full text-white transition-all"
-          style={{ background: '#E0001B', boxShadow: '0 2px 10px rgba(224,0,27,0.3)' }}
+          href="/#waitlist"
+          className="text-sm font-bold px-4 py-2 rounded-full transition-all duration-200"
+          style={{ background: '#E0001B', color: '#fff', boxShadow: '0 2px 10px rgba(224,0,27,0.3)', textDecoration: 'none' }}
         >
-          Get Started
+          Join!
         </Link>
       </div>
     </nav>
+  )
+}
+
+function Footer() {
+  return (
+    <footer
+      className="py-8 px-8 flex flex-col sm:flex-row items-center justify-between gap-4"
+      style={{ background: '#0f1923', borderTop: '1px solid rgba(255,255,255,0.04)' }}
+    >
+      <div className="flex items-center gap-2.5">
+        <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.35)' }}>AutoReplyr</span>
+      </div>
+      <div className="flex items-center gap-6">
+        <Link href="/privacy" className="text-xs transition-colors hover:text-white/60" style={{ color: 'rgba(255,255,255,0.25)' }}>Privacy</Link>
+        <Link href="/terms" className="text-xs transition-colors hover:text-white/60" style={{ color: 'rgba(255,255,255,0.25)' }}>Terms</Link>
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.18)' }}>© {new Date().getFullYear()} AutoReplyr</span>
+      </div>
+    </footer>
   )
 }
 
@@ -156,11 +181,9 @@ export default function PrivacyPage() {
 
           </div>
 
-          <p className="text-center text-xs text-gray-400 mt-8">
-            © {new Date().getFullYear()} Velza LLC · <Link href="/terms" className="underline">Terms of Service</Link>
-          </p>
         </div>
       </div>
+      <Footer />
     </>
   )
 }
