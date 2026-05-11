@@ -12,6 +12,7 @@ export const env = {
   adminEmail: () => requireEnv('ADMIN_EMAIL'),
   stripeSecretKey: () => requireEnv('STRIPE_SECRET_KEY'),
   stripeWebhookSecret: () => requireEnv('STRIPE_WEBHOOK_SECRET'),
-  stripePriceId: () => requireEnv('STRIPE_PRICE_ID'),
+  stripePriceIdMonthly: () => requireEnv('STRIPE_PRICE_ID_MONTHLY'),
+  stripePriceIdYearly: () => requireEnv('STRIPE_PRICE_ID_YEARLY'),
   appUrl: () => process.env.NEXT_PUBLIC_APP_URL ?? 'https://autoreplyr.com',
 }

@@ -139,6 +139,7 @@ interface FormState {
   providerPhoneNumberId: string // OpenPhone phoneNumberId; empty for E.164 providers
   providerPbxDomain: string    // Yeastar only
   openingMessage: string
+  billingInterval: 'monthly' | 'yearly'
 }
 
 // ── step components ────────────────────────────────────────────────────────
@@ -548,9 +549,11 @@ function Step3({
 
 function Step4({
   form,
+  setForm,
   onBack,
 }: {
   form: FormState
+  setForm: React.Dispatch<React.SetStateAction<FormState>>
   onBack: () => void
 }) {
   const [loading, setLoading] = useState(false)
@@ -575,6 +578,7 @@ function Step4({
       providerPhoneNumberId: form.providerPhoneNumberId || undefined,
       providerPbxDomain: form.providerPbxDomain || undefined,
       openingMessage: form.openingMessage,
+      billingInterval: form.billingInterval,
     }
 
     try {
@@ -598,11 +602,29 @@ function Step4({
 
   return (
     <div className="space-y-5">
+      {/* Billing toggle */}
+      <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
+        <button
+          type="button"
+          onClick={() => setForm((f) => ({ ...f, billingInterval: 'monthly' }))}
+          className={`flex-1 py-2.5 transition-colors ${form.billingInterval === 'monthly' ? 'bg-[#1B2A4A] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+        >
+          Monthly — $49/mo
+        </button>
+        <button
+          type="button"
+          onClick={() => setForm((f) => ({ ...f, billingInterval: 'yearly' }))}
+          className={`flex-1 py-2.5 transition-colors ${form.billingInterval === 'yearly' ? 'bg-[#1B2A4A] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+        >
+          Yearly — $490/yr <span className="text-xs opacity-75 ml-1">Save $98</span>
+        </button>
+      </div>
+
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-3 text-sm">
         <h3 className="font-semibold text-gray-900">Order summary</h3>
         <div className="flex justify-between text-gray-700">
-          <span>AutoReplyr — Monthly</span>
-          <span className="font-semibold">$97 / mo</span>
+          <span>AutoReplyr — {form.billingInterval === 'yearly' ? 'Annual' : 'Monthly'}</span>
+          <span className="font-semibold">{form.billingInterval === 'yearly' ? '$490 / yr' : '$49 / mo'}</span>
         </div>
         <div className="text-xs text-gray-400 border-t pt-3">
           Cancel anytime. No setup fee. Billing starts today.
@@ -677,6 +699,7 @@ export default function OnboardingPage() {
     providerPhoneNumberId: '',
     providerPbxDomain: '',
     openingMessage: DEFAULT_OPENING,
+    billingInterval: 'monthly',
   })
 
   const total = STEP_TITLES.length
@@ -704,7 +727,7 @@ export default function OnboardingPage() {
               <Step3 form={form} setForm={setForm} onNext={() => setStep(3)} onBack={() => setStep(1)} />
             )}
             {step === 3 && (
-              <Step4 form={form} onBack={() => setStep(2)} />
+              <Step4 form={form} setForm={setForm} onBack={() => setStep(2)} />
             )}
           </div>
 

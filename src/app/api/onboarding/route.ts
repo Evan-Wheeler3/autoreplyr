@@ -22,6 +22,9 @@ export interface OnboardingPayload {
 
   // Step 3
   openingMessage: string
+
+  // Billing
+  billingInterval: 'monthly' | 'yearly'
 }
 
 function defaultFlow(businessName: string, ownerName: string) {
@@ -60,6 +63,7 @@ export async function POST(req: Request) {
     providerPhoneNumberId,
     providerPbxDomain,
     openingMessage,
+    billingInterval,
   } = payload
 
   if (!businessName || !ownerEmail || !ownerNotifyNumber || !voipProvider || !providerPhoneNumber || !openingMessage) {
@@ -143,7 +147,9 @@ export async function POST(req: Request) {
     })
 
     // Create Stripe checkout session
-    const priceId = env.stripePriceId()
+    const priceId = billingInterval === 'yearly'
+      ? env.stripePriceIdYearly()
+      : env.stripePriceIdMonthly()
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
       mode: 'subscription',
